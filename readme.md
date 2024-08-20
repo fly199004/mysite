@@ -333,14 +333,15 @@ git clone  https://gitee.com/xiaofei90/flynn-page.git
 
    - 将你的Django项目代码上传到Ubuntu系统。
 
-   - 使用以下命令构建并运行Docker容器：
+   - 创建了docker-compose.yaml文件
 
      ```bash
-     docker build -t flynn_page .
-     docker run -v /var/www/FlynnPage/mysite:/app -p 8002:8002 flynn_page   # 实现挂载
+     docker-compose up -d
      ```
 
-2. **配置Nginx和Docker（可选）**
+2. 
+
+3. **配置Nginx和Docker（可选）**
    如果需要使用Nginx作为反向代理，还需要编写Nginx配置文件并将其与Docker容器集成。
 
 ### 3. 
