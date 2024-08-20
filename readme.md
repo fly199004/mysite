@@ -78,6 +78,7 @@
 ### 2. Docker化并部署到Ubuntu系统
 1. **编写Dockerfile**
    在Django项目的根目录下创建一个`Dockerfile`，内容如下：
+   
    ```dockerfile
    # 使用官方Python镜像
    FROM python:3.x
@@ -97,7 +98,7 @@
    # 运行Django服务器
    CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
    ```
-
+   
 2. **编写`requirements.txt`文件**
    使用以下命令生成依赖文件：
    ```bash
@@ -108,13 +109,14 @@
    如果需要使用数据库等服务，可以编写`docker-compose.yml`文件。
 
 4. **在Ubuntu系统上构建和运行Docker容器**
+   
    - 将你的Django项目代码上传到Ubuntu系统。
    - 使用以下命令构建并运行Docker容器：
      ```bash
      docker build -t mydjangoapp .
      docker run -d -p 8000:8000 mydjangoapp
      ```
-
+   
 5. **配置Nginx和Docker（可选）**
    如果需要使用Nginx作为反向代理，还需要编写Nginx配置文件并将其与Docker容器集成。
 
@@ -125,7 +127,7 @@
 
 
 
-## 基本设置
+## 网站基本设置
 
 ### 静态文件设计
 
@@ -301,3 +303,9 @@ urlpatterns = [
 6. **Web 安全：** 掌握常见的 Web 安全漏洞与防护措施，确保网站的安全性。
 7. **Docker 容器技术：** 通过 Docker 容器化技术，实现应用的快速部署与管理。
 8. **Git 版本管理：** 学习 Git 的使用方法，进行项目的版本控制与协作开发。
+
+
+
+## 上传至Ubuntu的Docker容器部署
+
+网站大致设计好之后 ，通过git上传至服务器，然后放到Docker容器中实现
