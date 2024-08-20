@@ -75,56 +75,7 @@
    ```
    确保在Windows环境中可以成功运行Django项目。
 
-### 2. Docker化并部署到Ubuntu系统
-1. **编写Dockerfile**
-   在Django项目的根目录下创建一个`Dockerfile`，内容如下：
-   
-   ```dockerfile
-   # 使用官方Python镜像
-   FROM python:3.x
-   
-   # 设置工作目录
-   WORKDIR /usr/src/app
-   
-   # 复制项目的requirements.txt文件
-   COPY requirements.txt ./
-   
-   # 安装项目依赖
-   RUN pip install --no-cache-dir -r requirements.txt
-   
-   # 复制项目文件到工作目录
-   COPY . .
-   
-   # 运行Django服务器
-   CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-   ```
-   
-2. **编写`requirements.txt`文件**
-   使用以下命令生成依赖文件：
-   ```bash
-   pip freeze > requirements.txt
-   ```
-
-3. **编写`docker-compose.yml`文件**（可选）
-   如果需要使用数据库等服务，可以编写`docker-compose.yml`文件。
-
-4. **在Ubuntu系统上构建和运行Docker容器**
-   
-   - 将你的Django项目代码上传到Ubuntu系统。
-   - 使用以下命令构建并运行Docker容器：
-     ```bash
-     docker build -t mydjangoapp .
-     docker run -d -p 8000:8000 mydjangoapp
-     ```
-   
-5. **配置Nginx和Docker（可选）**
-   如果需要使用Nginx作为反向代理，还需要编写Nginx配置文件并将其与Docker容器集成。
-
-### 3. 代码上传和同步
-1. **使用Git进行版本控制和上传**
-   - 在本地Windows系统上使用Git管理代码，并将代码推送到GitHub、GitLab等远程代码仓库。
-   - 在Ubuntu系统上通过Git拉取代码并进行Docker构建和部署。
-
+### 
 
 
 ## 网站基本设置
@@ -309,3 +260,88 @@ urlpatterns = [
 ## 上传至Ubuntu的Docker容器部署
 
 网站大致设计好之后 ，通过git上传至服务器，然后放到Docker容器中实现
+
+1. **编写Dockerfile**
+   在Django项目的根目录下创建一个`Dockerfile`，内容如下：
+
+   ```dockerfile
+   # 使用官方Python镜像
+   FROM python:3.x
+   
+   # 设置工作目录
+   WORKDIR /usr/src/app
+   
+   # 复制项目的requirements.txt文件
+   COPY requirements.txt ./
+   
+   # 安装项目依赖
+   RUN pip install --no-cache-dir -r requirements.txt
+   
+   # 复制项目文件到工作目录
+   COPY . .
+   
+   # 运行Django服务器
+   CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
+   ```
+
+2. **编写`requirements.txt`文件**
+   使用以下命令生成依赖文件：
+
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
+3. **编写`docker-compose.yml`文件**（可选）
+   如果需要使用数据库等服务，可以编写`docker-compose.yml`文件。
+
+
+
+### 代码上传和同步
+
+1. **使用Git进行版本控制和上传**
+
+   - 在本地Windows系统上使用Git管理代码，并将代码推送到GitHub、GitLab等远程代码仓库。
+
+   - 在Ubuntu系统上通过Git拉取代码并进行Docker构建和部署。
+
+     
+
+因为上传至githubb会出现网络问题，后续出现故障，帮上传至gitee
+
+```
+git init 
+git add .
+git commit -m '首次上传'
+git remote add gitee  https://gitee.com/xiaofei90/flynn-page.git
+git push -u gitee main
+```
+
+ 
+
+然后在ubuntu服务器用git 下拉仓库信息
+
+```
+git clone  https://gitee.com/xiaofei90/flynn-page.git
+```
+
+
+
+打开项目目录，
+
+### 2. Docker化并部署到Ubuntu系统
+
+1. **在Ubuntu系统上构建和运行Docker容器**
+
+   - 将你的Django项目代码上传到Ubuntu系统。
+
+   - 使用以下命令构建并运行Docker容器：
+
+     ```bash
+     docker build -t mydjangoapp .
+     docker run -d -p 8000:8000 mydjangoapp
+     ```
+
+2. **配置Nginx和Docker（可选）**
+   如果需要使用Nginx作为反向代理，还需要编写Nginx配置文件并将其与Docker容器集成。
+
+### 3. 
