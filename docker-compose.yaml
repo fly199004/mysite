@@ -2,6 +2,6 @@ services:
   web:
     image: flynn_page
     ports:
-      - "80002:8002"
+      - "8002:8002"
     volumes:
       - /var/www/FlynnPage/mysite:/app
