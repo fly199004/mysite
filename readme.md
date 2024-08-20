@@ -75,7 +75,6 @@
    ```
    确保在Windows环境中可以成功运行Django项目。
 
-### 
 
 
 ## 网站基本设置
@@ -337,8 +336,8 @@ git clone  https://gitee.com/xiaofei90/flynn-page.git
    - 使用以下命令构建并运行Docker容器：
 
      ```bash
-     docker build -t mydjangoapp .
-     docker run -d -p 8000:8000 mydjangoapp
+     docker build -t flynn_page .
+     docker run -d -p 8002:8002 flynn
      ```
 
 2. **配置Nginx和Docker（可选）**

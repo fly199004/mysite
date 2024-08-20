@@ -1,5 +1,5 @@
-# 使用官方Python镜像
-FROM python:3.x
+# 使用官方Python镜像,使用的是Ubuntu系统的python版本
+FROM python:3.10.12
 
 # 设置工作目录
 WORKDIR /var/www/Flynn
