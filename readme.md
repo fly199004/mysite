@@ -337,7 +337,7 @@ git clone  https://gitee.com/xiaofei90/flynn-page.git
 
      ```bash
      docker build -t flynn_page .
-     docker run -d -p 8002:8002 flynn
+     docker run -v /var/www/FlynnPage/mysite:/app -p 8002:8002 flynn_page   # 实现挂载
      ```
 
 2. **配置Nginx和Docker（可选）**
