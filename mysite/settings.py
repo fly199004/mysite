@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-!t0sdac3zjtqxq5c0543v(vf5gyb@4clo02(3@gm6&w$1!782p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'www.liufeisheng.cn',
+    'blog.liufeisheng.cn',
+    'test.liufeisheng.cn',
+    'www.itflynn.com',
+]
 
 
 # Application definition
