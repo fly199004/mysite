@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block left %}
+    <h3>文章列表</h3>
+    <ul id="article-list" style="list-style: none; padding: 0;">
+        {% for article in articles %}
+            <li>
+                <a href="{% url 'articles_detail' article.id %}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if selected_article %}
+        <h2>{{ selected_article.title }}</h2>
+        <p>作者: {{ selected_article.author }}</p>
+        <p>创建时间: {{ selected_article.createdAt }}</p>
+        <hr>
+        <div>{{ selected_article.content|safe }}</div>
+    {% else %}
+        <h2>请选择一篇文章</h2>
+    {% endif %}
+{% endblock %}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CRM System{% endblock %}</title>
+    <title>{% block title %}小飞老师{% endblock %}</title>
     {% load static %}
     <style>
         body {
@@ -49,11 +49,35 @@
             background-color: #555;
         }
 
+        container{
+            max-width: 100%;
+            display:flex;
+            /* flex-wrap: wrap; */
+            justify-content: space-between; /* 根据需要调整间距 */  
+        }
+
+        left right {            
+            padding:1rem;
+            background-color: #fff;
+        }
+        left{
+            padding:1rem;
+            width:15%;
+            order:1;
+            float:left;
+        }
         main {
-            padding: 2rem;
-            max-width: 800px;
+            padding: 1rem;
+            width: 60%;
             margin: 0 auto;
             flex: 1;
+            order:2;
+        }
+
+        right {
+            width:20%;
+            order:3;
+            float:right;
         }
 
         h2, h3 {
@@ -95,9 +119,21 @@
             nav ul li {
                 margin: 0.5rem 0;
             }
+            left, main, right {
+                /* width: 100%; */
+                padding: 1rem;                
+            }
 
             main {
-                padding: 1rem;
+                order: 1; /* 在手机端主内容优先显示 */
+            }
+
+            left {
+                order: 2;
+            }
+
+            right {
+                order: 3;
             }
 
             h2, h3 {
@@ -150,11 +186,23 @@
             
         </ul>
     </nav>
+    <container>
+        <left>
+            {% block left %}
+            {% endblock %}
+        </left>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <right>
+            {% block right %}
+            {% endblock %}
+        </right>
+    </container>
     
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+    {% block script %}
+    {% endblock %}
     <footer>
         <p>&copy; 版权所有， 小飞老师，2024. All rights reserved.</p>
     </footer>

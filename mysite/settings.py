@@ -83,8 +83,13 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'vanBlog',  # 数据库名
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            # 'host': 'mongodb://vanblog-mongo-1:27017/vanBlog'  # MongoDB URI,容器内部连接
+            'host': 'mongodb://172.22.0.2:27017/vanBlog'  # ubuntu主机上连接
+        }
     }
 }
 
