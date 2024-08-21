@@ -30,6 +30,8 @@ ALLOWED_HOSTS = [
     'blog.liufeisheng.cn',
     'test.liufeisheng.cn',
     'www.itflynn.com',
+    '127.0.0.1',
+    'localhost',
 ]
 
 

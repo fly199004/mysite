@@ -346,3 +346,30 @@ git clone  https://gitee.com/xiaofei90/flynn-page.git
    如果需要使用Nginx作为反向代理，还需要编写Nginx配置文件并将其与Docker容器集成。
 
 ### 3. 
+
+
+
+## 现有Flynn_page的docker容器与mongo容器连接
+
+`vanblog-mongo-1`和`vanblog-vanblog-1`两个容器已经位于同一个网络`vanblog_default`中。这表明他们可以通过此网络相互通信，使用容器名称作为主机名进行通信。
+
+如果您想让`flynn-page-web-1`容器也能访问MongoDB，您可以将它连接到`vanblog_default`网络。这样，所有的容器都在同一个网络中，能够更简单地进行数据共享和通信。以下是如何操作的步骤：
+
+1. **连接`flynn-page-web-1`到`vanblog_default`网络**：
+   
+   ```bash
+   docker network connect vanblog_default flynn-page-web-1
+   ```
+   
+2. **确认连接是否成功**：
+   您可以再次检查`flynn-page-web-1`的网络配置来确认它是否已经加入到`vanblog_default`网络：
+   ```bash
+   docker inspect --format='{{.NetworkSettings.Networks}}' flynn-page-web-1
+   ```
+
+完成这些步骤后，`flynn-page-web-1`就可以使用`vanblog-mongo-1`容器名来访问MongoDB数据库了。确保在`flynn-page-web-1`的数据库配置中使用正确的容器名称和端口。例如：
+```python
+DATABASE_URL="mongodb://vanblog-mongo-1:27017/vanBlog"
+```
+vanBlog为实际使用的数据库名称。这样设置后，`flynn_page`应用应能正确连接到MongoDB数据库。
+
