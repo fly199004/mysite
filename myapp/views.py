@@ -20,140 +20,35 @@ def test(request):
     return render(request, 'test.html')
 
 
-def articles(request, article_id=None):
-    # 连接到 MongoDB
-    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-    db = client[settings.DATABASES['default']['NAME']]   
 
-    # 查询所有文章标题
-    articles = db.articles.find({}, {"title": 1})
-    article_list = []
-    for article in articles:
-        article_list.append({
-            'id':str(article['_id']),
-            'title': article['title']
-        })
-
-    # 如果传递了文章ID，则获取文章详情
-    selected_article = None
-    if article_id:
-        article = db.articles.find_one({'_id': ObjectId(article_id)})
-        if article:
-            selected_article = get_article_content(article)
+def article_view(request, category=None, article_id=None, template_name='articles.html'):
+    manager = Article()
+    
+    # 获取文章列表（可选分类过滤）
+    article_list = manager.get_articles(category=category)
+    
+    # 获取选中的文章详情
+    selected_article = manager.get_article_by_id(article_id, category=category) if article_id else None
+    
     context = {
         'articles': article_list,
         'selected_article': selected_article
     }
-    return render(request, 'articles.html', context)
+    
+    return render(request, template_name, context)
+
+def articles(request, article_id=None):
+    return article_view(request, article_id=article_id, template_name='articles.html')
 
 def post(request, article_id=None):
-    # 连接到 MongoDB
-    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-    db = client[settings.DATABASES['default']['NAME']]
-        
-    # 查询 所有文章标题
-    articles = db.articles.find({},  {"title": 1, "id": 1})
-    article_list = []
-    for article in articles:
-        article_list.append({
-            'id': int(article['id']),  # 使用数字 id
-            'title': article['title']
-        })
-
-    # 如果传递了文章ID（数字 id），则获取文章详情
-    selected_article = None
-    if article_id:
-        article = db.articles.find_one({'id': int(article_id)})
-        if article:
-            selected_article = get_article_content(article)
-    
-    context = {
-        'articles': article_list,
-        'selected_article': selected_article
-    }
-    
-    return render(request, 'post.html', context)
-
-    
+    return article_view(request, article_id=article_id, template_name='post.html')
 
 def reading(request, article_id=None):
-    # 连接到 MongoDB
-    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-    db = client[settings.DATABASES['default']['NAME']]   
-
-    # 查询 category 为 "reading" 的所有文章标题
-    articles = db.articles.find({"category": "reading"}, {"title": 1, "id": 1})
-    article_list = []
-    for article in articles:
-        article_list.append({
-            'id': article['id'],  # 使用数字 id
-            'title': article['title']
-        })
-
-    # 如果传递了文章ID（数字 id），则获取文章详情
-    selected_article = None
-    if article_id:
-        article = db.articles.find_one({'id': int(article_id), 'category': 'reading'})
-        if article:
-            selected_article = get_article_content(article)
-    
-    context = {
-        'articles': article_list,
-        'selected_article': selected_article
-    }
-    
-    return render(request, 'reading.html', context)
+    return article_view(request, category="reading", article_id=article_id, template_name='reading.html')
 
 def teach(request, article_id=None):
-    # 连接到 MongoDB
-    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-    db = client[settings.DATABASES['default']['NAME']]   
-
-    # 查询 category 为 "teach" 的所有文章标题
-    articles = db.articles.find({"category": "teach"}, {"title": 1, "id": 1})
-    article_list = []
-    for article in articles:
-        article_list.append({
-            'id': article['id'],  # 使用数字 id
-            'title': article['title']
-        })
-
-    # 如果传递了文章ID（数字 id），则获取文章详情
-    selected_article = None
-    if article_id:
-        article = db.articles.find_one({'id': int(article_id), 'category': 'teach'})
-        if article:
-            selected_article = get_article_content(article)
-    
-    context = {
-        'articles': article_list,
-        'selected_article': selected_article
-    }
-    return render(request, 'teach.html', context)
+    return article_view(request, category="teach", article_id=article_id, template_name='teach.html')
 
 def tech(request, article_id=None):
-    # 连接到 MongoDB
-    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-    db = client[settings.DATABASES['default']['NAME']]   
+    return article_view(request, category="tech", article_id=article_id, template_name='tech.html')
 
-    # 查询 category 为 "teach" 的所有文章标题
-    articles = db.articles.find({"category": "tech"}, {"title": 1, "id": 1})
-    article_list = []
-    for article in articles:
-        article_list.append({
-            'id': article['id'],  # 使用数字 id
-            'title': article['title']
-        })
-
-    # 如果传递了文章ID（数字 id），则获取文章详情
-    selected_article = None
-    if article_id:
-        article = db.articles.find_one({'id': int(article_id), 'category': 'tech'})
-        if article:
-            selected_article = get_article_content(article)
-    
-    context = {
-        'articles': article_list,
-        'selected_article': selected_article
-    }
-    return render(request, 'tech.html', context)

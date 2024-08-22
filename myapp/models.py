@@ -1,6 +1,9 @@
 from djongo import models
 from bson import ObjectId
 import markdown,re
+from pymongo import MongoClient
+from django.conf import settings
+
 
 class Article(models.Model):
     _id = models.ObjectIdField()  # MongoDB中的ObjectId
