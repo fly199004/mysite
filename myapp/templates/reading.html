@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block left %}
+    <h3>阅读记录</h3>
+    <ul id="article-list" style="list-style: none; padding: 0;">
+        {% for article in articles %}
+            <li>
+                <a href="{% url 'reading_detail' article.id %}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if selected_article %}
+        <h2>{{ selected_article.title }}</h2>
+        <p>作者: {{ selected_article.author }}</p>
+        <p>创建时间: {{ selected_article.createdAt }}</p>
+        <hr>
+        <div>{{ selected_article.content|safe }}</div>
+    {% else %}
+        <h2>欢迎来到小飞老师的阅读空间！</h2>
+        <p>这里汇集了我在平日阅读和观影后的感想与记录。我热爱阅读，这不仅是获取知识的途径，也是我与世界对话的方式。在这里，您可以找到我对于书籍、电影以及其他形式文化作品的各种见解和思考。希望这些内容能激发您的思考，并与您一起分享阅读的乐趣。</p>
+        
+
+
+
+
+    {% endif %}
+{% endblock %}
+
+{% block right %}
+    {% if selected_article and selected_article.toc %}
+        <h3>文章目录</h3>
+        <div>
+            {{ selected_article.toc|safe }}
+        </div>
+    {% endif %}
+{% endblock %}
