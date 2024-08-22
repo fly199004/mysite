@@ -46,22 +46,35 @@ def articles(request, article_id=None):
     }
     return render(request, 'articles.html', context)
 
-def post(request, article_id):
+def post(request, article_id=None):
     # 连接到 MongoDB
     client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
     db = client[settings.DATABASES['default']['NAME']]
-    
-    # 查找指定 id 的文章
-    article = db.articles.find_one({'id': article_id})
-    
-    selected_article = None
-    if article:
-        selected_article = get_article_content(article)
+        
+    # 查询 所有文章标题
+    articles = db.articles.find({},  {"title": 1, "id": 1})
+    article_list = []
+    for article in articles:
+        article_list.append({
+            'id': int(article['id']),  # 使用数字 id
+            'title': article['title']
+        })
 
+    # 如果传递了文章ID（数字 id），则获取文章详情
+    selected_article = None
+    if article_id:
+        article = db.articles.find_one({'id': int(article_id)})
+        if article:
+            selected_article = get_article_content(article)
+    
     context = {
+        'articles': article_list,
         'selected_article': selected_article
     }
-    return render(request, 'articles.html', context)
+    
+    return render(request, 'post.html', context)
+
+    
 
 def reading(request, article_id=None):
     # 连接到 MongoDB

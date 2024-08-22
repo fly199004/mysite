@@ -24,6 +24,27 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    def __init__(self):
+        # 连接到 MongoDB
+        self.client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+        self.db = self.client[settings.DATABASES['default']['NAME']]
+
+    def get_articles(self, category=None):
+        """获取文章列表，可根据分类进行过滤"""
+        query = {}
+        if category:
+            query['category'] = category
+        articles = self.db.articles.find(query, {"title": 1, "id": 1})
+        return [{'id': article['id'], 'title': article['title']} for article in articles]
+
+    def get_article_by_id(self, article_id, category=None):
+        """根据数字 id 获取文章详情，可根据分类进行过滤"""
+        query = {'id': int(article_id)}
+        if category:
+            query['category'] = category
+        article = self.db.articles.find_one(query)
+        return get_article_content(article) if article else None
+
 
 # 解析文章内容中的图床 URL 并将它们转换为 <img> 标签
 def process_image_urls(content):

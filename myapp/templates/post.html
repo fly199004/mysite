@@ -5,7 +5,7 @@
     <ul id="article-list" style="list-style: none; padding: 0;">
         {% for article in articles %}
             <li>
-                <a href="{% url 'articles' article.id %}">
+                <a href="{% url 'post' article.id %}">
                     {{ article.title }}
                 </a>
             </li>
