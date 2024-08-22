@@ -24,3 +24,12 @@
         <h2>请选择一篇文章</h2>
     {% endif %}
 {% endblock %}
+
+{% block right %}
+    {% if selected_article and selected_article.toc %}
+        <h3>文章目录</h3>
+        <div>
+            {{ selected_article.toc|safe }}
+        </div>
+    {% endif %}
+{% endblock %}
