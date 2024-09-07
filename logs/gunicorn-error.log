@@ -1,0 +1,8 @@
+[2024-09-07 08:57:18 +0800] [4143037] [INFO] Starting gunicorn 23.0.0
+[2024-09-07 08:57:18 +0800] [4143037] [INFO] Listening at: http://0.0.0.0:8000 (4143037)
+[2024-09-07 08:57:18 +0800] [4143037] [INFO] Using worker: sync
+[2024-09-07 08:57:18 +0800] [4143050] [INFO] Booting worker with pid: 4143050
+[2024-09-07 08:57:18 +0800] [4143051] [INFO] Booting worker with pid: 4143051
+[2024-09-07 08:57:18 +0800] [4143052] [INFO] Booting worker with pid: 4143052
+[2024-09-07 08:57:18 +0800] [4143053] [INFO] Booting worker with pid: 4143053
+[2024-09-07 08:57:18 +0800] [4143057] [INFO] Booting worker with pid: 4143057
