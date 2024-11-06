@@ -19,7 +19,8 @@ def index(request):
 def test(request):
     return render(request, 'test.html')
 
-
+def me(request):
+    return render(request, 'me.html')
 
 def article_view(request, category=None, article_id=None, template_name='articles.html'):
     manager = Article()

@@ -77,3 +77,300 @@ SystemExit: 1
 [2024-11-06 08:32:31 +0800] [4024] [INFO] Booting worker with pid: 4024
 [2024-11-06 08:32:32 +0800] [4025] [INFO] Booting worker with pid: 4025
 [2024-11-06 08:32:32 +0800] [4026] [INFO] Booting worker with pid: 4026
+[2024-11-06 03:05:25 +0000] [4020] [INFO] Worker exiting (pid: 4020)
+[2024-11-06 03:05:25 +0000] [4018] [INFO] Worker exiting (pid: 4018)
+[2024-11-06 03:05:25 +0000] [4021] [INFO] Worker exiting (pid: 4021)
+[2024-11-06 03:05:25 +0000] [4019] [INFO] Worker exiting (pid: 4019)
+[2024-11-06 03:05:25 +0000] [4023] [INFO] Worker exiting (pid: 4023)
+[2024-11-06 03:05:25 +0000] [4025] [INFO] Worker exiting (pid: 4025)
+[2024-11-06 03:05:25 +0000] [4022] [INFO] Worker exiting (pid: 4022)
+[2024-11-06 03:05:25 +0000] [4024] [INFO] Worker exiting (pid: 4024)
+[2024-11-06 03:05:25 +0000] [4026] [INFO] Worker exiting (pid: 4026)
+[2024-11-06 11:05:25 +0800] [4015] [INFO] Handling signal: term
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4020) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4025) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4019) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4018) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4023) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4024) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [ERROR] Worker (pid:4022) was sent SIGTERM!
+[2024-11-06 11:05:25 +0800] [4015] [INFO] Shutting down: Master
+[2024-11-06 11:05:25 +0800] [14959] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:05:25 +0800] [14959] [INFO] Listening at: http://0.0.0.0:8000 (14959)
+[2024-11-06 11:05:25 +0800] [14959] [INFO] Using worker: sync
+[2024-11-06 11:05:25 +0800] [14962] [INFO] Booting worker with pid: 14962
+[2024-11-06 11:05:25 +0800] [14963] [INFO] Booting worker with pid: 14963
+[2024-11-06 11:05:25 +0800] [14964] [INFO] Booting worker with pid: 14964
+[2024-11-06 11:05:25 +0800] [14965] [INFO] Booting worker with pid: 14965
+[2024-11-06 11:05:25 +0800] [14966] [INFO] Booting worker with pid: 14966
+[2024-11-06 11:05:25 +0800] [14967] [INFO] Booting worker with pid: 14967
+[2024-11-06 11:05:25 +0800] [14968] [INFO] Booting worker with pid: 14968
+[2024-11-06 11:05:25 +0800] [14969] [INFO] Booting worker with pid: 14969
+[2024-11-06 11:05:25 +0800] [14970] [INFO] Booting worker with pid: 14970
+[2024-11-06 03:11:12 +0000] [14966] [INFO] Worker exiting (pid: 14966)
+[2024-11-06 03:11:12 +0000] [14969] [INFO] Worker exiting (pid: 14969)
+[2024-11-06 03:11:12 +0000] [14965] [INFO] Worker exiting (pid: 14965)
+[2024-11-06 11:11:12 +0800] [14959] [INFO] Handling signal: term
+[2024-11-06 03:11:12 +0000] [14968] [INFO] Worker exiting (pid: 14968)
+[2024-11-06 03:11:12 +0000] [14963] [INFO] Worker exiting (pid: 14963)
+[2024-11-06 03:11:12 +0000] [14962] [INFO] Worker exiting (pid: 14962)
+[2024-11-06 03:11:12 +0000] [14970] [INFO] Worker exiting (pid: 14970)
+[2024-11-06 11:11:12 +0800] [14959] [ERROR] Worker (pid:14966) was sent SIGTERM!
+[2024-11-06 03:11:12 +0000] [14967] [INFO] Worker exiting (pid: 14967)
+[2024-11-06 11:11:12 +0800] [14959] [ERROR] Worker (pid:14969) was sent SIGTERM!
+[2024-11-06 03:11:12 +0000] [14964] [INFO] Worker exiting (pid: 14964)
+[2024-11-06 11:11:12 +0800] [14959] [INFO] Shutting down: Master
+[2024-11-06 11:11:12 +0800] [15425] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:11:12 +0800] [15425] [INFO] Listening at: http://0.0.0.0:8000 (15425)
+[2024-11-06 11:11:12 +0800] [15425] [INFO] Using worker: sync
+[2024-11-06 11:11:12 +0800] [15427] [INFO] Booting worker with pid: 15427
+[2024-11-06 11:11:12 +0800] [15428] [INFO] Booting worker with pid: 15428
+[2024-11-06 11:11:12 +0800] [15429] [INFO] Booting worker with pid: 15429
+[2024-11-06 11:11:12 +0800] [15430] [INFO] Booting worker with pid: 15430
+[2024-11-06 11:11:12 +0800] [15431] [INFO] Booting worker with pid: 15431
+[2024-11-06 11:11:12 +0800] [15432] [INFO] Booting worker with pid: 15432
+[2024-11-06 11:11:12 +0800] [15433] [INFO] Booting worker with pid: 15433
+[2024-11-06 11:11:12 +0800] [15434] [INFO] Booting worker with pid: 15434
+[2024-11-06 11:11:12 +0800] [15435] [INFO] Booting worker with pid: 15435
+[2024-11-06 03:16:38 +0000] [15429] [INFO] Worker exiting (pid: 15429)
+[2024-11-06 03:16:38 +0000] [15433] [INFO] Worker exiting (pid: 15433)
+[2024-11-06 11:16:38 +0800] [15425] [INFO] Handling signal: term
+[2024-11-06 03:16:38 +0000] [15435] [INFO] Worker exiting (pid: 15435)
+[2024-11-06 11:16:38 +0800] [15425] [ERROR] Worker (pid:15433) was sent SIGTERM!
+[2024-11-06 11:16:38 +0800] [15425] [ERROR] Worker (pid:15429) was sent SIGTERM!
+[2024-11-06 03:16:38 +0000] [15432] [INFO] Worker exiting (pid: 15432)
+[2024-11-06 03:16:38 +0000] [15431] [INFO] Worker exiting (pid: 15431)
+[2024-11-06 03:16:38 +0000] [15434] [INFO] Worker exiting (pid: 15434)
+[2024-11-06 03:16:38 +0000] [15427] [INFO] Worker exiting (pid: 15427)
+[2024-11-06 11:16:48 +0800] [15864] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:16:48 +0800] [15864] [INFO] Listening at: http://0.0.0.0:8000 (15864)
+[2024-11-06 11:16:48 +0800] [15864] [INFO] Using worker: sync
+[2024-11-06 11:16:48 +0800] [15866] [INFO] Booting worker with pid: 15866
+[2024-11-06 11:16:49 +0800] [15867] [INFO] Booting worker with pid: 15867
+[2024-11-06 11:16:49 +0800] [15868] [INFO] Booting worker with pid: 15868
+[2024-11-06 11:16:49 +0800] [15869] [INFO] Booting worker with pid: 15869
+[2024-11-06 11:16:49 +0800] [15870] [INFO] Booting worker with pid: 15870
+[2024-11-06 11:16:49 +0800] [15871] [INFO] Booting worker with pid: 15871
+[2024-11-06 11:16:49 +0800] [15872] [INFO] Booting worker with pid: 15872
+[2024-11-06 11:16:49 +0800] [15873] [INFO] Booting worker with pid: 15873
+[2024-11-06 11:16:49 +0800] [15874] [INFO] Booting worker with pid: 15874
+[2024-11-06 03:24:23 +0000] [15870] [INFO] Worker exiting (pid: 15870)
+[2024-11-06 03:24:23 +0000] [15874] [INFO] Worker exiting (pid: 15874)
+[2024-11-06 03:24:23 +0000] [15868] [INFO] Worker exiting (pid: 15868)
+[2024-11-06 03:24:23 +0000] [15869] [INFO] Worker exiting (pid: 15869)
+[2024-11-06 03:24:23 +0000] [15867] [INFO] Worker exiting (pid: 15867)
+[2024-11-06 11:24:23 +0800] [15864] [INFO] Handling signal: term
+[2024-11-06 11:24:23 +0800] [15864] [ERROR] Worker (pid:15867) was sent SIGTERM!
+[2024-11-06 03:24:23 +0000] [15873] [INFO] Worker exiting (pid: 15873)
+[2024-11-06 03:24:23 +0000] [15871] [INFO] Worker exiting (pid: 15871)
+[2024-11-06 03:24:23 +0000] [15872] [INFO] Worker exiting (pid: 15872)
+[2024-11-06 03:24:23 +0000] [15866] [INFO] Worker exiting (pid: 15866)
+[2024-11-06 11:24:23 +0800] [15864] [INFO] Shutting down: Master
+[2024-11-06 11:24:23 +0800] [16370] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:24:23 +0800] [16370] [INFO] Listening at: http://0.0.0.0:8000 (16370)
+[2024-11-06 11:24:23 +0800] [16370] [INFO] Using worker: sync
+[2024-11-06 11:24:23 +0800] [16372] [INFO] Booting worker with pid: 16372
+[2024-11-06 11:24:23 +0800] [16373] [INFO] Booting worker with pid: 16373
+[2024-11-06 11:24:23 +0800] [16374] [INFO] Booting worker with pid: 16374
+[2024-11-06 11:24:23 +0800] [16375] [INFO] Booting worker with pid: 16375
+[2024-11-06 11:24:23 +0800] [16376] [INFO] Booting worker with pid: 16376
+[2024-11-06 11:24:23 +0800] [16377] [INFO] Booting worker with pid: 16377
+[2024-11-06 11:24:23 +0800] [16378] [INFO] Booting worker with pid: 16378
+[2024-11-06 11:24:24 +0800] [16379] [INFO] Booting worker with pid: 16379
+[2024-11-06 11:24:24 +0800] [16380] [INFO] Booting worker with pid: 16380
+[2024-11-06 11:37:02 +0800] [16370] [CRITICAL] WORKER TIMEOUT (pid:16375)
+[2024-11-06 03:37:02 +0000] [16375] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-06 03:37:02 +0000] [16375] [INFO] Worker exiting (pid: 16375)
+[2024-11-06 11:37:02 +0800] [17246] [INFO] Booting worker with pid: 17246
+[2024-11-06 11:38:09 +0800] [16370] [CRITICAL] WORKER TIMEOUT (pid:16373)
+[2024-11-06 11:38:09 +0800] [16370] [CRITICAL] WORKER TIMEOUT (pid:16379)
+[2024-11-06 03:38:09 +0000] [16373] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-06 03:38:09 +0000] [16379] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-06 03:38:09 +0000] [16373] [INFO] Worker exiting (pid: 16373)
+[2024-11-06 03:38:09 +0000] [16379] [INFO] Worker exiting (pid: 16379)
+[2024-11-06 11:38:09 +0800] [17321] [INFO] Booting worker with pid: 17321
+[2024-11-06 11:38:09 +0800] [17322] [INFO] Booting worker with pid: 17322
+[2024-11-06 03:48:43 +0000] [16378] [INFO] Worker exiting (pid: 16378)
+[2024-11-06 03:48:43 +0000] [16376] [INFO] Worker exiting (pid: 16376)
+[2024-11-06 03:48:43 +0000] [16377] [INFO] Worker exiting (pid: 16377)
+[2024-11-06 03:48:43 +0000] [16374] [INFO] Worker exiting (pid: 16374)
+[2024-11-06 03:48:43 +0000] [17321] [INFO] Worker exiting (pid: 17321)
+[2024-11-06 03:48:43 +0000] [17246] [INFO] Worker exiting (pid: 17246)
+[2024-11-06 03:48:43 +0000] [16380] [INFO] Worker exiting (pid: 16380)
+[2024-11-06 03:48:43 +0000] [16372] [INFO] Worker exiting (pid: 16372)
+[2024-11-06 11:48:43 +0800] [16370] [INFO] Handling signal: term
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:16372) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:16380) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:16377) was sent SIGTERM!
+[2024-11-06 03:48:43 +0000] [17322] [INFO] Worker exiting (pid: 17322)
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:16376) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:17246) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:17321) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [ERROR] Worker (pid:16378) was sent SIGTERM!
+[2024-11-06 11:48:43 +0800] [16370] [INFO] Shutting down: Master
+[2024-11-06 11:48:43 +0800] [18045] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:48:43 +0800] [18045] [INFO] Listening at: http://0.0.0.0:8000 (18045)
+[2024-11-06 11:48:43 +0800] [18045] [INFO] Using worker: sync
+[2024-11-06 11:48:43 +0800] [18047] [INFO] Booting worker with pid: 18047
+[2024-11-06 11:48:43 +0800] [18048] [INFO] Booting worker with pid: 18048
+[2024-11-06 11:48:43 +0800] [18049] [INFO] Booting worker with pid: 18049
+[2024-11-06 11:48:43 +0800] [18050] [INFO] Booting worker with pid: 18050
+[2024-11-06 11:48:43 +0800] [18051] [INFO] Booting worker with pid: 18051
+[2024-11-06 11:48:43 +0800] [18052] [INFO] Booting worker with pid: 18052
+[2024-11-06 11:48:43 +0800] [18053] [INFO] Booting worker with pid: 18053
+[2024-11-06 11:48:43 +0800] [18054] [INFO] Booting worker with pid: 18054
+[2024-11-06 11:48:43 +0800] [18055] [INFO] Booting worker with pid: 18055
+[2024-11-06 11:49:36 +0800] [18045] [CRITICAL] WORKER TIMEOUT (pid:18051)
+[2024-11-06 11:49:36 +0800] [18045] [CRITICAL] WORKER TIMEOUT (pid:18052)
+[2024-11-06 03:49:36 +0000] [18052] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-06 03:49:36 +0000] [18051] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-06 03:49:36 +0000] [18052] [INFO] Worker exiting (pid: 18052)
+[2024-11-06 03:49:36 +0000] [18051] [INFO] Worker exiting (pid: 18051)
+[2024-11-06 11:49:36 +0800] [18131] [INFO] Booting worker with pid: 18131
+[2024-11-06 11:49:36 +0800] [18132] [INFO] Booting worker with pid: 18132
+[2024-11-06 11:52:31 +0800] [18045] [INFO] Handling signal: term
+[2024-11-06 03:52:31 +0000] [18131] [INFO] Worker exiting (pid: 18131)
+[2024-11-06 03:52:31 +0000] [18048] [INFO] Worker exiting (pid: 18048)
+[2024-11-06 03:52:31 +0000] [18054] [INFO] Worker exiting (pid: 18054)
+[2024-11-06 03:52:31 +0000] [18132] [INFO] Worker exiting (pid: 18132)
+[2024-11-06 03:52:31 +0000] [18050] [INFO] Worker exiting (pid: 18050)
+[2024-11-06 03:52:31 +0000] [18049] [INFO] Worker exiting (pid: 18049)
+[2024-11-06 03:52:31 +0000] [18047] [INFO] Worker exiting (pid: 18047)
+[2024-11-06 03:52:31 +0000] [18053] [INFO] Worker exiting (pid: 18053)
+[2024-11-06 03:52:31 +0000] [18055] [INFO] Worker exiting (pid: 18055)
+[2024-11-06 11:52:31 +0800] [18045] [INFO] Shutting down: Master
+[2024-11-06 11:52:31 +0800] [18354] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 11:52:31 +0800] [18354] [INFO] Listening at: http://0.0.0.0:8000 (18354)
+[2024-11-06 11:52:31 +0800] [18354] [INFO] Using worker: sync
+[2024-11-06 11:52:31 +0800] [18356] [INFO] Booting worker with pid: 18356
+[2024-11-06 11:52:31 +0800] [18357] [INFO] Booting worker with pid: 18357
+[2024-11-06 11:52:31 +0800] [18358] [INFO] Booting worker with pid: 18358
+[2024-11-06 11:52:31 +0800] [18359] [INFO] Booting worker with pid: 18359
+[2024-11-06 11:52:31 +0800] [18360] [INFO] Booting worker with pid: 18360
+[2024-11-06 11:52:31 +0800] [18361] [INFO] Booting worker with pid: 18361
+[2024-11-06 11:52:31 +0800] [18362] [INFO] Booting worker with pid: 18362
+[2024-11-06 11:52:31 +0800] [18363] [INFO] Booting worker with pid: 18363
+[2024-11-06 11:52:31 +0800] [18364] [INFO] Booting worker with pid: 18364
+[2024-11-06 04:02:00 +0000] [18360] [INFO] Worker exiting (pid: 18360)
+[2024-11-06 12:02:00 +0800] [18354] [INFO] Handling signal: term
+[2024-11-06 04:02:00 +0000] [18358] [INFO] Worker exiting (pid: 18358)
+[2024-11-06 04:02:00 +0000] [18363] [INFO] Worker exiting (pid: 18363)
+[2024-11-06 04:02:00 +0000] [18361] [INFO] Worker exiting (pid: 18361)
+[2024-11-06 04:02:00 +0000] [18362] [INFO] Worker exiting (pid: 18362)
+[2024-11-06 04:02:00 +0000] [18356] [INFO] Worker exiting (pid: 18356)
+[2024-11-06 04:02:00 +0000] [18364] [INFO] Worker exiting (pid: 18364)
+[2024-11-06 04:02:00 +0000] [18357] [INFO] Worker exiting (pid: 18357)
+[2024-11-06 04:02:00 +0000] [18359] [INFO] Worker exiting (pid: 18359)
+[2024-11-06 12:02:00 +0800] [18354] [INFO] Shutting down: Master
+[2024-11-06 12:02:00 +0800] [18996] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 12:02:00 +0800] [18996] [INFO] Listening at: http://0.0.0.0:8000 (18996)
+[2024-11-06 12:02:00 +0800] [18996] [INFO] Using worker: sync
+[2024-11-06 12:02:00 +0800] [18998] [INFO] Booting worker with pid: 18998
+[2024-11-06 12:02:01 +0800] [18999] [INFO] Booting worker with pid: 18999
+[2024-11-06 12:02:01 +0800] [19000] [INFO] Booting worker with pid: 19000
+[2024-11-06 12:02:01 +0800] [19001] [INFO] Booting worker with pid: 19001
+[2024-11-06 12:02:01 +0800] [19002] [INFO] Booting worker with pid: 19002
+[2024-11-06 12:02:01 +0800] [19003] [INFO] Booting worker with pid: 19003
+[2024-11-06 12:02:01 +0800] [19004] [INFO] Booting worker with pid: 19004
+[2024-11-06 12:02:01 +0800] [19005] [INFO] Booting worker with pid: 19005
+[2024-11-06 12:02:01 +0800] [19006] [INFO] Booting worker with pid: 19006

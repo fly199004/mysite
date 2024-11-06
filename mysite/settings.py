@@ -87,8 +87,7 @@ DATABASES = {
         'NAME': 'vanBlog',  # 数据库名
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            # 'host': 'mongodb://vanblog-mongo-1:27017/vanBlog'  # MongoDB URI,容器内部连接
-            'host': 'mongodb://localhost:27017/vanBlog'  # ubuntu主机上连接
+            'host': 'mongodb://localhost:27017/vanBlog'  # localhost主机上连接
         }
     }
 }
@@ -128,10 +127,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# 静态文件配置
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / 'static',  # 项目级静态文件目录
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # 用于生产环境的静态文件收集目录
 
 
 # Default primary key field type

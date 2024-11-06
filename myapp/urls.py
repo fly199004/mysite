@@ -16,4 +16,7 @@ urlpatterns = [
     path('teach/<int:article_id>/', views.teach, name='teach'),
     path('tech/', views.tech, name='tech'),
     path('tech/<int:article_id>/', views.tech, name='tech'),
+    path('me/', views.me, name='me'),
+    path('aboutme/', views.me, name='me'),
+    path('c/aboutme/', views.me, name='me'),
 ]
