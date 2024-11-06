@@ -88,7 +88,7 @@ DATABASES = {
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
             # 'host': 'mongodb://vanblog-mongo-1:27017/vanBlog'  # MongoDB URI,容器内部连接
-            'host': 'mongodb://172.22.0.2:27017/vanBlog'  # ubuntu主机上连接
+            'host': 'mongodb://localhost:27017/vanBlog'  # ubuntu主机上连接
         }
     }
 }

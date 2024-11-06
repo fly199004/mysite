@@ -1,7 +1,10 @@
 services:
   web:
-    image: flynn_page
+    build: .             
+    image: mysite   # the same name with docker build
     ports:
-      - "8002:8002"
+      - "82:82"
     volumes:
-      - /var/www/FlynnPage/flynn-page:/app
+      - /usr/local/mysite:/usr/local/mysite
+    environment:
+      - PYTHONUNBUFFERED=1

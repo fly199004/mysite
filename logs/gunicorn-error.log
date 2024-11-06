@@ -6,3 +6,74 @@
 [2024-09-07 08:57:18 +0800] [4143052] [INFO] Booting worker with pid: 4143052
 [2024-09-07 08:57:18 +0800] [4143053] [INFO] Booting worker with pid: 4143053
 [2024-09-07 08:57:18 +0800] [4143057] [INFO] Booting worker with pid: 4143057
+[2024-11-05 20:07:48 +0800] [6995] [INFO] Starting gunicorn 23.0.0
+[2024-11-05 20:07:48 +0800] [6995] [INFO] Listening at: http://0.0.0.0:8000 (6995)
+[2024-11-05 20:07:48 +0800] [6995] [INFO] Using worker: sync
+[2024-11-05 20:07:48 +0800] [6998] [INFO] Booting worker with pid: 6998
+[2024-11-05 20:07:48 +0800] [6999] [INFO] Booting worker with pid: 6999
+[2024-11-05 20:07:48 +0800] [7000] [INFO] Booting worker with pid: 7000
+[2024-11-05 20:07:48 +0800] [7001] [INFO] Booting worker with pid: 7001
+[2024-11-05 20:07:48 +0800] [7002] [INFO] Booting worker with pid: 7002
+[2024-11-05 20:07:48 +0800] [7003] [INFO] Booting worker with pid: 7003
+[2024-11-05 20:07:48 +0800] [7005] [INFO] Booting worker with pid: 7005
+[2024-11-05 20:07:48 +0800] [7004] [INFO] Booting worker with pid: 7004
+[2024-11-05 20:07:48 +0800] [7006] [INFO] Booting worker with pid: 7006
+[2024-11-05 20:08:09 +0800] [6995] [INFO] Handling signal: int
+[2024-11-05 12:08:09 +0000] [7006] [INFO] Worker exiting (pid: 7006)
+[2024-11-05 12:08:09 +0000] [7001] [INFO] Worker exiting (pid: 7001)
+[2024-11-05 12:08:09 +0000] [7000] [INFO] Worker exiting (pid: 7000)
+[2024-11-05 12:08:09 +0000] [7003] [INFO] Worker exiting (pid: 7003)
+[2024-11-05 12:08:09 +0000] [7004] [INFO] Worker exiting (pid: 7004)
+[2024-11-05 12:08:09 +0000] [7005] [INFO] Worker exiting (pid: 7005)
+[2024-11-05 12:08:09 +0000] [6998] [INFO] Worker exiting (pid: 6998)
+[2024-11-05 12:08:09 +0000] [7002] [INFO] Worker exiting (pid: 7002)
+[2024-11-05 12:08:09 +0000] [6999] [INFO] Worker exiting (pid: 6999)
+[2024-11-05 20:08:10 +0800] [6995] [INFO] Shutting down: Master
+[2024-11-05 20:09:03 +0800] [7187] [INFO] Starting gunicorn 23.0.0
+[2024-11-05 20:09:03 +0800] [7187] [INFO] Listening at: http://0.0.0.0:8000 (7187)
+[2024-11-05 20:09:03 +0800] [7187] [INFO] Using worker: sync
+[2024-11-05 20:09:03 +0800] [7189] [INFO] Booting worker with pid: 7189
+[2024-11-05 20:09:03 +0800] [7190] [INFO] Booting worker with pid: 7190
+[2024-11-05 20:09:03 +0800] [7191] [INFO] Booting worker with pid: 7191
+[2024-11-05 20:09:03 +0800] [7192] [INFO] Booting worker with pid: 7192
+[2024-11-05 20:09:03 +0800] [7193] [INFO] Booting worker with pid: 7193
+[2024-11-05 20:09:03 +0800] [7194] [INFO] Booting worker with pid: 7194
+[2024-11-05 20:09:03 +0800] [7195] [INFO] Booting worker with pid: 7195
+[2024-11-05 20:09:04 +0800] [7196] [INFO] Booting worker with pid: 7196
+[2024-11-05 20:09:04 +0800] [7197] [INFO] Booting worker with pid: 7197
+[2024-11-05 20:09:48 +0800] [7187] [CRITICAL] WORKER TIMEOUT (pid:7197)
+[2024-11-05 12:09:48 +0000] [7197] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-05 12:09:48 +0000] [7197] [INFO] Worker exiting (pid: 7197)
+[2024-11-05 20:09:48 +0800] [7286] [INFO] Booting worker with pid: 7286
+[2024-11-06 08:32:31 +0800] [4015] [INFO] Starting gunicorn 23.0.0
+[2024-11-06 08:32:31 +0800] [4015] [INFO] Listening at: http://0.0.0.0:8000 (4015)
+[2024-11-06 08:32:31 +0800] [4015] [INFO] Using worker: sync
+[2024-11-06 08:32:31 +0800] [4018] [INFO] Booting worker with pid: 4018
+[2024-11-06 08:32:31 +0800] [4019] [INFO] Booting worker with pid: 4019
+[2024-11-06 08:32:31 +0800] [4020] [INFO] Booting worker with pid: 4020
+[2024-11-06 08:32:31 +0800] [4021] [INFO] Booting worker with pid: 4021
+[2024-11-06 08:32:31 +0800] [4022] [INFO] Booting worker with pid: 4022
+[2024-11-06 08:32:31 +0800] [4023] [INFO] Booting worker with pid: 4023
+[2024-11-06 08:32:31 +0800] [4024] [INFO] Booting worker with pid: 4024
+[2024-11-06 08:32:32 +0800] [4025] [INFO] Booting worker with pid: 4025
+[2024-11-06 08:32:32 +0800] [4026] [INFO] Booting worker with pid: 4026
