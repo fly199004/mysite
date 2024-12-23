@@ -19,4 +19,5 @@ urlpatterns = [
     path('me/', views.me, name='me'),
     path('aboutme/', views.me, name='me'),
     path('c/aboutme/', views.me, name='me'),
+    path('dh/',views.dh,name='dh')
 ]

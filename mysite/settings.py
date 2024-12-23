@@ -29,9 +29,11 @@ ALLOWED_HOSTS = [
     'www.liufeisheng.cn',
     'blog.liufeisheng.cn',
     'test.liufeisheng.cn',
+    'dh.liufeisheng.cn',
     'www.itflynn.com',
     '127.0.0.1',
     'localhost',
+    '47.113.145.248',
 ]
 
 

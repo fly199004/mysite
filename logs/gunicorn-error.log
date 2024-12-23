@@ -374,3 +374,195 @@ SystemExit: 1
 [2024-11-06 12:02:01 +0800] [19004] [INFO] Booting worker with pid: 19004
 [2024-11-06 12:02:01 +0800] [19005] [INFO] Booting worker with pid: 19005
 [2024-11-06 12:02:01 +0800] [19006] [INFO] Booting worker with pid: 19006
+[2024-11-17 17:06:56 +0800] [11073] [INFO] Starting gunicorn 23.0.0
+[2024-11-17 17:06:56 +0800] [11073] [INFO] Listening at: http://0.0.0.0:8000 (11073)
+[2024-11-17 17:06:56 +0800] [11073] [INFO] Using worker: sync
+[2024-11-17 17:06:56 +0800] [11075] [INFO] Booting worker with pid: 11075
+[2024-11-17 17:06:56 +0800] [11076] [INFO] Booting worker with pid: 11076
+[2024-11-17 17:06:56 +0800] [11077] [INFO] Booting worker with pid: 11077
+[2024-11-17 17:06:56 +0800] [11078] [INFO] Booting worker with pid: 11078
+[2024-11-17 17:06:56 +0800] [11079] [INFO] Booting worker with pid: 11079
+[2024-11-17 17:06:56 +0800] [11080] [INFO] Booting worker with pid: 11080
+[2024-11-17 17:06:56 +0800] [11081] [INFO] Booting worker with pid: 11081
+[2024-11-17 17:06:56 +0800] [11082] [INFO] Booting worker with pid: 11082
+[2024-11-17 17:06:56 +0800] [11083] [INFO] Booting worker with pid: 11083
+[2024-11-17 18:23:15 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:11078)
+[2024-11-17 10:23:15 +0000] [11078] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 10:23:15 +0000] [11078] [INFO] Worker exiting (pid: 11078)
+[2024-11-17 18:23:16 +0800] [18443] [INFO] Booting worker with pid: 18443
+[2024-11-17 18:24:52 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:11082)
+[2024-11-17 10:24:52 +0000] [11082] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 10:24:52 +0000] [11082] [INFO] Worker exiting (pid: 11082)
+[2024-11-17 18:24:52 +0800] [18527] [INFO] Booting worker with pid: 18527
+[2024-11-17 18:29:52 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:11081)
+[2024-11-17 10:29:52 +0000] [11081] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 10:29:52 +0000] [11081] [INFO] Worker exiting (pid: 11081)
+[2024-11-17 18:29:52 +0800] [18820] [INFO] Booting worker with pid: 18820
+[2024-11-17 18:39:52 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:11075)
+[2024-11-17 10:39:52 +0000] [11075] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 10:39:52 +0000] [11075] [INFO] Worker exiting (pid: 11075)
+[2024-11-17 18:39:52 +0800] [19348] [INFO] Booting worker with pid: 19348
+[2024-11-17 19:09:52 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:19348)
+[2024-11-17 11:09:52 +0000] [19348] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 11:09:52 +0000] [19348] [INFO] Worker exiting (pid: 19348)
+[2024-11-17 19:09:52 +0800] [21051] [INFO] Booting worker with pid: 21051
+[2024-11-17 19:34:03 +0800] [11073] [CRITICAL] WORKER TIMEOUT (pid:11083)
+[2024-11-17 11:34:03 +0000] [11083] [ERROR] Error handling request (no URI read)
+Traceback (most recent call last):
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/sync.py", line 133, in handle
+    req = next(parser)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/parser.py", line 41, in __next__
+    self.mesg = self.mesg_class(self.cfg, self.unreader, self.source_addr, self.req_count)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 259, in __init__
+    super().__init__(cfg, unreader, peer_addr)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 60, in __init__
+    unused = self.parse(self.unreader)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 271, in parse
+    self.get_data(unreader, buf, stop=True)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/message.py", line 262, in get_data
+    data = unreader.read()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 36, in read
+    d = self.chunk()
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/http/unreader.py", line 63, in chunk
+    return self.sock.recv(self.mxchunk)
+  File "/usr/local/mysite/venv/lib/python3.7/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2024-11-17 11:34:03 +0000] [11083] [INFO] Worker exiting (pid: 11083)
+[2024-11-17 19:34:03 +0800] [22704] [INFO] Booting worker with pid: 22704
+[2024-11-17 21:38:28 +0800] [1216] [INFO] Starting gunicorn 23.0.0
+[2024-11-17 21:38:28 +0800] [1216] [INFO] Listening at: http://0.0.0.0:8000 (1216)
+[2024-11-17 21:38:28 +0800] [1216] [INFO] Using worker: sync
+[2024-11-17 21:38:28 +0800] [1501] [INFO] Booting worker with pid: 1501
+[2024-11-17 21:38:28 +0800] [1502] [INFO] Booting worker with pid: 1502
+[2024-11-17 21:38:28 +0800] [1503] [INFO] Booting worker with pid: 1503
+[2024-11-17 21:38:28 +0800] [1504] [INFO] Booting worker with pid: 1504
+[2024-11-17 21:38:28 +0800] [1506] [INFO] Booting worker with pid: 1506
+[2024-11-17 21:38:29 +0800] [1507] [INFO] Booting worker with pid: 1507
+[2024-11-17 21:38:29 +0800] [1509] [INFO] Booting worker with pid: 1509
+[2024-11-17 21:38:29 +0800] [1511] [INFO] Booting worker with pid: 1511
+[2024-11-17 21:38:29 +0800] [1512] [INFO] Booting worker with pid: 1512
+[2024-11-25 21:04:43 +0800] [1265] [INFO] Starting gunicorn 23.0.0
+[2024-11-25 21:04:43 +0800] [1265] [INFO] Listening at: http://0.0.0.0:8000 (1265)
+[2024-11-25 21:04:43 +0800] [1265] [INFO] Using worker: sync
+[2024-11-25 21:04:43 +0800] [1334] [INFO] Booting worker with pid: 1334
+[2024-11-25 21:04:43 +0800] [1339] [INFO] Booting worker with pid: 1339
+[2024-11-25 21:04:43 +0800] [1342] [INFO] Booting worker with pid: 1342
+[2024-11-25 21:04:43 +0800] [1343] [INFO] Booting worker with pid: 1343
+[2024-11-25 21:04:43 +0800] [1344] [INFO] Booting worker with pid: 1344
+[2024-11-25 21:04:43 +0800] [1346] [INFO] Booting worker with pid: 1346
+[2024-11-25 21:04:43 +0800] [1352] [INFO] Booting worker with pid: 1352
+[2024-11-25 21:04:44 +0800] [1353] [INFO] Booting worker with pid: 1353
+[2024-11-25 21:04:44 +0800] [1354] [INFO] Booting worker with pid: 1354
+[2024-12-08 09:56:29 +0800] [1245] [INFO] Starting gunicorn 23.0.0
+[2024-12-08 09:56:29 +0800] [1245] [INFO] Listening at: http://0.0.0.0:8000 (1245)
+[2024-12-08 09:56:29 +0800] [1245] [INFO] Using worker: sync
+[2024-12-08 09:56:29 +0800] [1385] [INFO] Booting worker with pid: 1385
+[2024-12-08 09:56:29 +0800] [1397] [INFO] Booting worker with pid: 1397
+[2024-12-08 09:56:29 +0800] [1403] [INFO] Booting worker with pid: 1403
+[2024-12-08 09:56:29 +0800] [1405] [INFO] Booting worker with pid: 1405
+[2024-12-08 09:56:29 +0800] [1406] [INFO] Booting worker with pid: 1406
+[2024-12-08 09:56:29 +0800] [1407] [INFO] Booting worker with pid: 1407
+[2024-12-08 09:56:29 +0800] [1408] [INFO] Booting worker with pid: 1408
+[2024-12-08 09:56:30 +0800] [1409] [INFO] Booting worker with pid: 1409
+[2024-12-08 09:56:30 +0800] [1410] [INFO] Booting worker with pid: 1410

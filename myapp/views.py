@@ -53,3 +53,6 @@ def teach(request, article_id=None):
 def tech(request, article_id=None):
     return article_view(request, category="tech", article_id=article_id, template_name='tech.html')
 
+
+def dh(request):
+    return render(request, 'dh.html')
