@@ -89,7 +89,7 @@ DATABASES = {
         'NAME': 'vanBlog',  # 数据库名
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb://localhost:27017/vanBlog'  # localhost主机上连接
+            'host': 'mongodb://47.113.145.248:27017/vanBlog'  # localhost主机上连接
         }
     }
 }
