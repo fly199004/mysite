@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block left %}
+{% block article_list %}
     <h3>阅读记录</h3>
     <ul id="article-list" style="list-style: none; padding: 0;">
         {% for article in articles %}
@@ -31,7 +31,7 @@
     {% endif %}
 {% endblock %}
 
-{% block right %}
+{% block table_of_contents %}
     {% if selected_article and selected_article.toc %}
         <h3>文章目录</h3>
         <div>

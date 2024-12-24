@@ -2,6 +2,10 @@
 
 {% block left %}
     <h3>文章列表</h3>
+    
+    
+{% endblock %}
+{% block article_list %}
     <ul id="article-list" style="list-style: none; padding: 0;">
         {% for article in articles %}
             <li>
@@ -11,7 +15,6 @@
             </li>
         {% endfor %}
     </ul>
-    
 {% endblock %}
 
 {% block content %}
