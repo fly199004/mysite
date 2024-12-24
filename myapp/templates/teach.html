@@ -23,11 +23,20 @@
     {% else %}
         <h2>欢迎来到小飞老师的教学空间！</h2>
         <p>这里收录了我在各种课程教学过程中的详细记录和教学心得。每一次的授课都是知识传递和思想碰撞的过程，我在这里将这些珍贵的瞬间进行记录，希望能为教育同行提供参考，也为学生们留下学习的足迹。无论是课堂上的讲解，还是互动讨论的片段，您都可以在这里找到。</p>
-        
-
-
-
-
+                  
+        <hr style="margin: 2em 0;">
+        <h3>教学记录</h3>
+        <ul id="article-list" style="list-style: none; padding: 0;">
+            {% for article in articles %}
+                <li>
+                    <a href="{% url 'teach' article.id %}">
+                        {{ article.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+            
+       
     {% endif %}
 {% endblock %}
 
