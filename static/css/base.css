@@ -151,11 +151,18 @@ h2, h3 {
 /* 文章列表样式 */
 .article-list {
     list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.article-list li {
+    margin: 0;
+    padding: 0;
 }
 
 .article-list a {
     display: block;
-    padding: 0.8rem;
+    padding: 0.1rem 0;
     color: var(--text-color);
     text-decoration: none;
     transition: all 0.3s ease;
