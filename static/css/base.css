@@ -58,8 +58,8 @@ left, right {
 
 left {
     padding: 1rem;
-    width: 10%;
-    order: 1;
+    /* width: 10%;
+    order: 1; */
     float: left;
     background-color: #9e4848;
     border: 5px solid #9e4848;
@@ -69,8 +69,8 @@ main {
     padding: 1rem;
     width: 60%;
     margin: 0 auto;
-    flex: 1;
-    order: 2;
+    /* flex: 1;
+    order: 2; */
 }
 
 main img {
@@ -82,8 +82,8 @@ main content {
 }
 
 right {
-    width: 20%;
-    order: 3;
+    /* width: 20%;
+    order: 3; */
     float: right;
 }
 
