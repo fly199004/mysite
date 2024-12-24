@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}小飞老师{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">首页</a></li>
+            <li><a href="/tech">IT记录</a></li>
+            <li><a href="/teach">IT教学</a></li>
+            <li><a href="/reading">阅读记录</a></li>
+            <li><a href="http://blog.liufeisheng.cn">博客</a></li>
+            <li><a href="/me">关于我</a></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <aside class="sidebar-left">
+            
+        </aside>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="sticky-sidebar">
+                <!-- 文章目录 -->
+                <div class="mb-4">
+                    <h5>目录</h5>
+                    <div id="toc">
+                        {% block table_of_contents %}{% endblock %}
+                    </div>
+                </div>
+
+                <!-- 分类专栏 -->
+                <div class="mb-4">
+                    <h5>分类专栏</h5>
+                    <ul class="category-list">
+                        {% block categories %}{% endblock %}
+                    </ul>
+                </div>
+                {% block right %}{% endblock %}
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <p>&copy;2024 小飞老师 <a href="http://beian.miit.gov.cn" style="color:white;"> 粤ICP备2024204428号</a>.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block script %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

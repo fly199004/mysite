@@ -58,9 +58,11 @@ left, right {
 
 left {
     padding: 1rem;
-    width: 15%;
+    width: 10%;
     order: 1;
     float: left;
+    background-color: #9e4848;
+    border: 5px solid #9e4848;
 }
 
 main {
