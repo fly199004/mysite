@@ -1,0 +1,129 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">照片详情</h4>
+                    <div>
+                        <button type="button" class="btn btn-primary" id="editBtn">编辑信息</button>
+                        <a href="{% url 'photo:photo_list' %}" class="btn btn-secondary">返回列表</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 照片展示区域 -->
+                    <div class="text-center mb-4 photo-container">
+                        <img src="{{ photo.signed_url }}" class="detail-img" alt="{{ photo.title }}">
+                    </div>
+
+                    <!-- 信息显示区域 -->
+                    <div id="infoDisplay">
+                        <h5>{{ photo.title }}</h5>
+                        <p class="text-muted">上传时间：{{ photo.created|date:"Y-m-d H:i" }}</p>
+                        <p class="mb-0">{{ photo.description|default:"暂无描述" }}</p>
+                    </div>
+
+                    <!-- 信息编辑区域 -->
+                    <div id="infoEdit" style="display: none;">
+                        <form id="editForm" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="title" class="form-label">标题</label>
+                                <input type="text" class="form-control" id="title" name="title" value="{{ photo.title }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">描述</label>
+                                <textarea class="form-control" id="description" name="description" rows="3">{{ photo.description }}</textarea>
+                            </div>
+                            <div class="mt-3">
+                                <button type="submit" class="btn btn-primary">保存</button>
+                                <button type="button" class="btn btn-secondary" id="cancelBtn">取消</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-primary {
+    background-color: #417690;
+    border-color: #417690;
+}
+.btn-primary:hover {
+    background-color: #2b5177;
+    border-color: #2b5177;
+}
+.photo-container {
+    max-width: 100%;
+    overflow: auto;
+}
+.detail-img {
+    max-width: 100%;  /* 限制最大宽度为容器宽度 */
+    height: auto;     /* 保持原始比例 */
+}
+.card {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const infoDisplay = document.getElementById('infoDisplay');
+    const infoEdit = document.getElementById('infoEdit');
+    const editForm = document.getElementById('editForm');
+
+    // 显示编辑表单
+    editBtn.addEventListener('click', function() {
+        infoDisplay.style.display = 'none';
+        infoEdit.style.display = 'block';
+    });
+
+    // 取消编辑
+    cancelBtn.addEventListener('click', function() {
+        infoDisplay.style.display = 'block';
+        infoEdit.style.display = 'none';
+    });
+
+    // 提交表单
+    editForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch('{% url "photo:photo_detail" photo.pk %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 更新显示的信息
+                document.querySelector('#infoDisplay h5').textContent = data.title;
+                document.querySelector('#infoDisplay p:last-child').textContent = data.description || '暂无描述';
+                
+                // 切换回显示模式
+                infoDisplay.style.display = 'block';
+                infoEdit.style.display = 'none';
+            } else {
+                alert('保存失败：' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('保存失败：' + error);
+        });
+    });
+});
+</script>
+{% endblock %}

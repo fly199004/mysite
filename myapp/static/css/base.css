@@ -1,0 +1,188 @@
+/* 全局设置 */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1.5rem;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #555;
+}
+
+/* 容器布局 */
+container {
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 左中右区域布局 */
+left, right {
+    padding: 1rem;
+    background-color: #fff;
+}
+
+left {
+    padding: 1rem;
+    width: 15%;
+    order: 1;
+    float: left;
+}
+
+main {
+    padding: 1rem;
+    width: 60%;
+    margin: 0 auto;
+    flex: 1;
+    order: 2;
+}
+
+main img {
+    max-width: 100%;
+}
+
+main content {
+    max-width: 100%;
+}
+
+right {
+    width: 20%;
+    order: 3;
+    float: right;
+}
+
+/* 标题样式 */
+h2, h3 {
+    color: #4CAF50;
+}
+
+/* 样式调整 */
+.intro, .purpose, .modules, .data-source {
+    margin-bottom: 2rem;
+}
+
+.intro img, .modules img, .data-source img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+ul {
+    text-align: left;
+    display: inline-block;
+    margin: 1rem auto;
+}
+
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #333;
+    color: #fff;
+}
+
+img {
+    text-align: center;
+}
+
+/* 屏幕宽度小于768px时的布局 */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        margin: 0.5rem 0;
+    }
+
+    container {
+        flex-direction: column; /* 调整容器为垂直布局 */
+    }
+
+    left, main, right {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    main {
+        order: 2;
+    }
+
+    left {
+        order: 3;
+    }
+
+    right {
+        order: 1;
+    }
+
+    h2, h3 {
+        font-size: 1.5rem;
+    }
+
+    ul {
+        width: 100%;
+    }
+}
+
+/* 屏幕宽度小于480px时的布局 */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    nav ul li a {
+        padding: 0.5rem;
+    }
+
+    container {
+        flex-direction: column; /* 确保容器在小屏幕时为垂直布局 */
+    }
+
+    main {
+        padding: 0.5rem;
+    }
+
+    h2, h3 {
+        font-size: 1.2rem;
+    }
+
+    table tr td {
+        text-align: center;
+        color: red;
+    }
+}

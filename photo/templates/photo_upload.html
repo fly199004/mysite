@@ -1,0 +1,104 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">批量上传照片</h4>
+                </div>
+                <div class="card-body">
+                    <form id="uploadForm" method="post" enctype="multipart/form-data" class="mb-4">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="photos" class="form-label">选择照片（可多选）</label>
+                            <input type="file" class="form-control" id="photos" name="photos" multiple accept="image/*" required>
+                        </div>
+                        <div class="progress mb-3 d-none" id="uploadProgress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div id="uploadStatus"></div>
+                        <button type="submit" class="btn btn-primary">上传</button>
+                        <a href="{% url 'photo:photo_list' %}" class="btn btn-secondary">返回列表</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('uploadForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const progressBar = document.querySelector('#uploadProgress');
+    const progressBarInner = progressBar.querySelector('.progress-bar');
+    const statusDiv = document.getElementById('uploadStatus');
+    
+    // 显示进度条
+    progressBar.classList.remove('d-none');
+    progressBarInner.style.width = '0%';
+    statusDiv.innerHTML = '';
+    
+    fetch('{% url "photo:upload_photos" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 更新进度条为完成状态
+        progressBarInner.style.width = '100%';
+        
+        // 显示上传结果
+        const results = data.results;
+        const successCount = results.filter(r => r.success).length;
+        const failCount = results.filter(r => !r.success).length;
+        
+        let html = `<div class="alert ${failCount === 0 ? 'alert-success' : 'alert-warning'}">`;
+        html += `成功上传 ${successCount} 张照片`;
+        if (failCount > 0) {
+            html += `，${failCount} 张照片上传失败`;
+        }
+        html += '</div>';
+        
+        // 如果有失败的，显示详细信息
+        if (failCount > 0) {
+            html += '<div class="alert alert-danger"><ul>';
+            results.filter(r => !r.success).forEach(result => {
+                html += `<li>${result.name}: ${result.error}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        statusDiv.innerHTML = html;
+        
+        // 如果全部成功，3秒后跳转到列表页
+        if (failCount === 0) {
+            setTimeout(() => {
+                window.location.href = '{% url "photo:photo_list" %}';
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        progressBar.classList.add('d-none');
+        statusDiv.innerHTML = `<div class="alert alert-danger">上传失败: ${error}</div>`;
+    });
+});
+</script>
+
+<style>
+.progress {
+    height: 25px;
+}
+.progress-bar {
+    transition: width 0.3s ease;
+}
+</style>
+{% endblock %}

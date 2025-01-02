@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}小飞老师{% endblock %}
+
+{% block content %}
+<section class="intro">
+    <div class="module">
+        <h2 style="text-align: center;">我是一名IT码农、大学老师<br>旨在分享和传播知识，为广大学习者提供有价值的信息</h2>
+        <p>本站是小飞老师利用业余闲暇时间设计与开发的，旨在为学生示范如何将课堂上所学的知识应用于实际的网站设计与开发中。</p>
+        <hr style="margin: 2em 0;">
+<p>以下是一些常用网站链接，可能对您的学习和生活有所帮助：</p>
+
+    <div class="website-links">
+        <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手" class="website-link">
+            <i class="fas fa-robot fa-2x"></i>
+            <span>豆包</span>
+        </a>
+        <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台" class="website-link">
+            <i class="fas fa-book-open fa-2x"></i>
+            <span>超星</span>
+        </a>
+        <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台" class="website-link">
+            <i class="fab fa-tiktok fa-2x"></i>
+            <span>抖音</span>
+        </a>
+        <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区" class="website-link">
+            <i class="fas fa-brain fa-2x"></i>
+            <span>AIGC</span>
+        </a>
+        <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具" class="website-link">
+            <i class="fas fa-project-diagram fa-2x"></i>
+            <span>迅捷画图</span>
+        </a>
+        <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库" class="website-link">
+            <i class="fas fa-book fa-2x"></i>
+            <span>知网</span>
+        </a>
+        <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台" class="website-link">
+            <i class="fab fa-bilibili fa-2x"></i>
+            <span>哔哩哔哩</span>
+        </a>
+        <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区" class="website-link">
+            <i class="fas fa-code fa-2x"></i>
+            <span>CSDN</span>
+        </a>
+        
+    </div>
+
+    
+    <style>
+        .website-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 20px;
+        }
+        .website-link {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 20px 20px;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+
+
+        <hr style="margin: 2em 0;">
+        <p>本站开发中目前涉及的主要知识点
+            <li><b>HTML 与 CSS 基本设计基础：</b> 学习网页的基本结构和样式布局，掌握响应式设计技巧。</li>
+            <li><b>JavaScript 动态网页设计：</b> 通过 JavaScript 实现网页的动态交互功能，提升用户体验。</li>
+            <li><b>前端开发框架：</b> 使用 jQuery、Vue 等前端框架，开发模块化和高效的前端应用。</li>
+            <li><b>数据库管理：</b> 学习数据库的基本操作与管理，为网站提供数据支持。</li>
+            <li><b>Linux 操作系统与服务器配置：</b> 了解 Linux 系统的基本操作，以及服务器的配置与管理。</li>
+            <li><b>Web 安全：</b> 掌握常见的 Web 安全漏洞与防护措施，确保网站的安全性。</li>
+            <li><b>Docker 容器技术：</b> 通过 Docker 容器化技术，实现应用的快速部署与管理。</li>
+            <li><b>Git 版本管理：</b> 学习 Git 的使用方法，进行项目的版本控制与协作开发。</li>
+        </p>
+    </div>
+    
+    
+    
+
+    <style>
+               
+
+        .module h2 {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        } 
+
+        .module h3 {
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+
+        .module p {
+            margin: 0 0 10px 0;
+            padding-left: 20px;
+        }
+
+        .module ul {
+            list-style-type: disc;
+            margin-left: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .module h2 {
+                font-size: 18px;
+            }
+
+            .module h3 {
+                font-size: 16px;
+            }
+        }
+    </style>
+ 
+</section>
+
+{% endblock %}

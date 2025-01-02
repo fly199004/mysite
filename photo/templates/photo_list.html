@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+
+{% block content %}
+<h2 class="page-title">我的照片列表</h2>
+<div class="photo-list">
+    <!-- 添加标签筛选区域 -->
+    <div class="tag-filter">
+        <a href="{% url 'photo:photo_list' %}" class="tag-link {% if not current_tag %}active{% endif %}">
+            全部
+        </a>
+        {% for tag in all_tags %}
+            <a href="?tag={{ tag.id }}" class="tag-link {% if current_tag == tag.id|stringformat:'s' %}active{% endif %}">
+                {{ tag.name }}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% for photo in photos %}
+        <div class="photo-card">
+            <h3 class="photo-title">{{ photo.title }}</h3>
+            <div class="photo-image-container">
+                {% if photo.image_url %}
+                    <a href="{% url 'photo:photo_detail' photo.id %}">
+                        <img src="{{ photo.image_url }}" alt="{{ photo.title }}">
+                    </a>
+                {% endif %}
+            </div>
+            <div class="photo-info">
+                <div class="photo-description">{{ photo.description|truncatechars:50 }}</div>
+                <div class="photo-date">上传于 {{ photo.created|date:"Y-m-d H:i" }}</div>
+                {% if photo.tags.all %}
+                    <div class="photo-tags">
+                        {% for tag in photo.tags.all %}
+                            <span class="tag">{{ tag.name }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-message">
+            还没有上传任何照片
+        </div>
+    {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<nav class="pagination-container">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            <li><a href="?page={{ page_obj.previous_page_number }}">上一页</a></li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            <li {% if page_obj.number == num %}class="active"{% endif %}>
+                <a href="?page={{ num }}">{{ num }}</a>
+            </li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">下一页</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<head>
+    <style>
+        /* 照片列表容器 */
+        .photo-list {
+            max-width: 1200px;
+            display: grid;    
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 15px 0;
+            margin: 0 auto;
+        }
+
+        /* 照片卡片样式 */
+        .photo-card {
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #fff;
+            width: 100%;
+            max-width: 250px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            height: 300px;  /* 增加卡片高度以容纳所有内容 */
+        }
+
+        /* 标题样式 */
+        .photo-title {
+            padding: 10px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 图片容器 */
+        .photo-image-container {
+            width: 100%;
+            height: 200px;  /* 固定图片区域高度 */
+            overflow: hidden;
+        }
+
+        /* 照片缩略图样式 */
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        /* 照片信息区域 */
+        .photo-info {
+            padding: 10px;
+            font-size: 0.9em;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+
+        .photo-date {
+            margin-top: 5px;
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        /* 响应式布局 */
+        @media (max-width: 1200px) {
+            .photo-list {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .photo-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        .tag-filter {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .tag-link {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            border-radius: 15px;
+            background-color: #f0f0f0;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .tag-link.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .tag-link:hover {
+            background-color: #ddd;
+        }
+
+        .photo-tags {
+            margin-top: 5px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            background-color: #e0e0e0;
+            font-size: 0.8em;
+            color: #666;
+        }
+    </style>
+</head>
+{% endblock %}

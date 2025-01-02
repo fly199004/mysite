@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+
+{% block article_list %}
+    <h3>IT记录</h3>
+    <ul id="article-list" style="list-style: none; padding: 0;">
+        {% for article in articles %}
+            <li>
+                <a href="{% url 'tech' article.id %}">
+                    {{ article.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if selected_article %}
+        <h2>{{ selected_article.title }}</h2>
+        <p>作者: {{ selected_article.author }}</p>
+        <p>创建时间: {{ selected_article.createdAt }}</p>
+        <hr>
+        <div>{{ selected_article.content|safe }}</div>
+    {% else %}
+        <h2>欢迎来到小飞老师的IT技术记录！</h2>
+        <p>这里记录了我在编程、探索新技术、以及解决日常技术问题时的一些思考和体会。每一行代码都是学习和实践的过程，我在这里分享那些我认为有帮助的技术见解和实用技巧，希望能为大家提供一些参考和帮助。</p>
+        <hr style="margin: 2em 0;">
+        <h3>IT记录</h3>
+        <ul id="article-list" style="list-style: none; padding: 0;">
+            {% for article in articles %}
+                <li>
+                    <a href="{% url 'tech' article.id %}">
+                        {{ article.title }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}
+
+{% block table_of_contents %}
+    {% if selected_article and selected_article.toc %}
+    <h3>文章目录</h3>
+    <div>
+        {{ selected_article.toc|safe }}
+    </div>
+    {% endif %}
+{% endblock %}
