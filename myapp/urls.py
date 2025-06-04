@@ -17,6 +17,7 @@ urlpatterns = [
     path('tech/', views.tech, name='tech'),
     path('tech/<int:article_id>/', views.tech, name='tech'),
     path('me/', views.me, name='me'),
+    path('datav/', views.datav, name='datav'),
     path('aboutme/', views.me, name='me'),
     path('c/aboutme/', views.me, name='me'),
     path('dh/',views.dh,name='dh')

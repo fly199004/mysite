@@ -22,6 +22,9 @@ def test(request):
 def me(request):
     return render(request, 'me.html')
 
+def datav(request):
+    return render(request, 'datav.html')
+
 def article_view(request, category=None, article_id=None, template_name='articles.html'):
     manager = Article()
     
