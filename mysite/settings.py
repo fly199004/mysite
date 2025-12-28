@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '47.113.145.248',
+    '192.170.3.4',
 ]
 
 
@@ -101,7 +102,7 @@ if USE_MONGO:
         'NAME': 'vanBlog',  # 数据库名
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb://localhost:27017/vanBlog'  # localhost主机上连接
+            'host': 'mongodb://172.17.0.1:27017/vanBlog'  # 连接到Docker主机上的MongoDB
         }
     }
 }
