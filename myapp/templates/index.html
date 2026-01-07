@@ -2,89 +2,92 @@
 
 {% block title %}小飞老师{% endblock %}
 
+{% block right %}
+<div class="sidebar-section">
+    <div class="section-box">
+        <h3 class="section-title"><i class="fas fa-link"></i> 常用网站链接</h3>
+        <div class="common-links">
+            <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手">
+                <i class="fas fa-robot"></i> 豆包
+            </a>
+            <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台">
+                <i class="fas fa-book-open"></i> 超星
+            </a>
+            <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台">
+                <i class="fab fa-tiktok"></i> 抖音
+            </a>
+            <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区">
+                <i class="fas fa-brain"></i> AIGC
+            </a>
+            <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具">
+                <i class="fas fa-project-diagram"></i> 迅捷画图
+            </a>
+            <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库">
+                <i class="fas fa-book"></i> 知网
+            </a>
+            <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台">
+                <i class="fab fa-bilibili"></i> 哔哩哔哩
+            </a>
+            <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区">
+                <i class="fas fa-code"></i> CSDN
+            </a>
+            <a href="http://nas.liufeisheng.cn" target="_blank" title="NAS - 网络存储">
+                <i class="fas fa-server"></i> NAS
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <section class="intro">
     <div class="module">
-        <h2 style="text-align: center;">我是一名IT码农、大学老师<br>旨在分享和传播知识，为广大学习者提供有价值的信息</h2>
-        <p>本站是小飞老师利用业余闲暇时间设计与开发的，旨在为学生示范如何将课堂上所学的知识应用于实际的网站设计与开发中。</p>
-        <hr style="margin: 2em 0;">
-<p>以下是一些常用网站链接，可能对您的学习和生活有所帮助：</p>
-
-    <div class="website-links">
-        <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手" class="website-link">
-            <i class="fas fa-robot fa-2x"></i>
-            <span>豆包</span>
-        </a>
-        <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台" class="website-link">
-            <i class="fas fa-book-open fa-2x"></i>
-            <span>超星</span>
-        </a>
-        <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台" class="website-link">
-            <i class="fab fa-tiktok fa-2x"></i>
-            <span>抖音</span>
-        </a>
-        <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区" class="website-link">
-            <i class="fas fa-brain fa-2x"></i>
-            <span>AIGC</span>
-        </a>
-        <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具" class="website-link">
-            <i class="fas fa-project-diagram fa-2x"></i>
-            <span>迅捷画图</span>
-        </a>
-        <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库" class="website-link">
-            <i class="fas fa-book fa-2x"></i>
-            <span>知网</span>
-        </a>
-        <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台" class="website-link">
-            <i class="fab fa-bilibili fa-2x"></i>
-            <span>哔哩哔哩</span>
-        </a>
-        <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区" class="website-link">
-            <i class="fas fa-code fa-2x"></i>
-            <span>CSDN</span>
-        </a>
-        
-    </div>
-
-    
-    <style>
-        .website-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 20px;
-        }
-        .website-link {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin: 20px 20px;
-            align-items: center;
-            text-decoration: none;
-            color: inherit;
-        }
-    </style>
-
-
-        <hr style="margin: 2em 0;">
-        <p>本站开发中目前涉及的主要知识点
-            <li><b>HTML 与 CSS 基本设计基础：</b> 学习网页的基本结构和样式布局，掌握响应式设计技巧。</li>
-            <li><b>JavaScript 动态网页设计：</b> 通过 JavaScript 实现网页的动态交互功能，提升用户体验。</li>
-            <li><b>前端开发框架：</b> 使用 jQuery、Vue 等前端框架，开发模块化和高效的前端应用。</li>
-            <li><b>数据库管理：</b> 学习数据库的基本操作与管理，为网站提供数据支持。</li>
-            <li><b>Linux 操作系统与服务器配置：</b> 了解 Linux 系统的基本操作，以及服务器的配置与管理。</li>
-            <li><b>Web 安全：</b> 掌握常见的 Web 安全漏洞与防护措施，确保网站的安全性。</li>
-            <li><b>Docker 容器技术：</b> 通过 Docker 容器化技术，实现应用的快速部署与管理。</li>
-            <li><b>Git 版本管理：</b> 学习 Git 的使用方法，进行项目的版本控制与协作开发。</li>
+        <h2 style="text-align: center;">欢迎来到小飞老师的网站</h2>
+        <p style="text-align: center; font-size: 1.1em; margin: 1.5em 0;">
+            本网站旨在更好地交流IT技能和AI知识，分享技术经验与实践心得。
         </p>
+        <hr style="margin: 2em 0;">
+        
+        <h3>个人开发的网站与推荐工具</h3>
+        
+        <div class="website-showcase">
+            <div class="website-item">
+                <h4><i class="fas fa-blog"></i> <a href="http://blog.liufeisheng.cn" target="_blank">个人博客</a></h4>
+                <p>blog.liufeisheng.cn - 个人博客，记录技术学习与思考</p>
+            </div>
+            
+            <div class="website-item">
+                <h4><i class="fas fa-users"></i> <a href="http://crm.liufeisheng.cn" target="_blank">CRM系统</a></h4>
+                <p>crm.liufeisheng.cn - 自己开发的CRM系统（英文版），用于客户关系管理</p>
+            </div>
+            
+            <div class="website-item">
+                <h4><i class="fas fa-chart-bar"></i> <a href="https://www.liufeisheng.cn/datav/" target="_blank">数据可视化工具</a></h4>
+                <p>数据可视化工具 - 上传您的Excel或CSV文件，快速生成交互式图表和可视化报表。支持多种图表类型：柱状图、折线图、饼图、环形图、雷达图等。具有直观的界面、多种图表类型选择，以及友好的数据处理体验。</p>
+            </div>
+            
+            <div class="website-item">
+                <h4><i class="fas fa-digital-tachograph"></i> <a href="https://dh.liufeisheng.cn/" target="_blank">数字化人文技术</a></h4>
+                <p>数字化人文技术平台 - 探索人文与技术的结合</p>
+            </div>
+            
+            <div class="website-item">
+                <h4><i class="fas fa-robot"></i> <a href="http://www.liufeisheng.cn:8085" target="_blank">Open WebUI</a></h4>
+                <p>端口8085 - Open WebUI，Docker容器部署的AI交互界面</p>
+            </div>
+            
+            <div class="website-item">
+                <h4><i class="fas fa-project-diagram"></i> <a href="http://www.liufeisheng.cn:8059" target="_blank">交互式知识图谱</a></h4>
+                <p>端口8059 - 交互式知识图谱工具，可视化知识关系网络</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2em; padding: 1em; background-color: #f0f0f0; border-radius: 5px;">
+            <p style="margin: 0; color: #666; font-style: italic;">更多内容正在开发中，敬请期待...</p>
+        </div>
     </div>
     
-    
-    
-
     <style>
-               
-
         .module h2 {
             background-color: #4CAF50;
             color: #fff;
@@ -94,25 +97,66 @@
         } 
 
         .module h3 {
-            margin-bottom: 5px;
+            margin-bottom: 1em;
             color: #4CAF50;
+            font-size: 1.3em;
+        }
+        
+        .module h4 {
+            margin-bottom: 0.5em;
+            color: #2c3e50;
+        }
+        
+        .module h4 a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .module h4 a:hover {
+            text-decoration: underline;
         }
 
         .module p {
             margin: 0 0 10px 0;
-            padding-left: 20px;
+            padding-left: 0;
+            line-height: 1.6;
         }
 
-        .module ul {
-            list-style-type: disc;
-            margin-left: 40px;
+        .website-showcase {
+            margin: 1.5em 0;
+        }
+        
+        .website-item {
+            margin-bottom: 1.5em;
+            padding: 1em;
+            background-color: #fafafa;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .website-item:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .website-item h4 {
+            margin-top: 0;
+            margin-bottom: 0.5em;
+        }
+        
+        .website-item h4 i {
+            margin-right: 0.5em;
+            color: #4CAF50;
+        }
+        
+        .website-item p {
+            margin: 0.5em 0 0 0;
+            color: #666;
+            font-size: 0.95em;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
             .module h2 {
                 font-size: 18px;
             }
@@ -120,9 +164,12 @@
             .module h3 {
                 font-size: 16px;
             }
+            
+            .website-item {
+                padding: 0.8em;
+            }
         }
     </style>
- 
 </section>
 
 {% endblock %}

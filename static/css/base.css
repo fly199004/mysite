@@ -46,6 +46,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0.8rem 1rem;
+    position: relative;
 }
 
 .logo a {
@@ -55,10 +56,24 @@ body {
     text-decoration: none;
 }
 
+/* 导航栏切换按钮（手机端显示） */
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+}
+
 .nav-links {
     display: flex;
     list-style: none;
     gap: 1rem;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-links li a {
@@ -67,6 +82,7 @@ body {
     padding: 0.5rem 1rem;
     border-radius: 4px;
     transition: all 0.3s ease;
+    display: block;
 }
 
 .nav-links li a:hover {
@@ -225,6 +241,88 @@ h2, h3 {
     color: var(--secondary-color);
 }
 
+/* 常用链接样式 */
+.common-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.common-links a {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem;
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    gap: 0.5rem;
+}
+
+.common-links a:hover {
+    background-color: var(--hover-color);
+    color: var(--secondary-color);
+}
+
+.common-links a i {
+    width: 20px;
+    text-align: center;
+}
+
+/* 目录收缩功能样式 */
+.toc-wrapper {
+    position: relative;
+}
+
+.toc-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--secondary-color);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.toc-toggle:hover {
+    background-color: #2980b9;
+    transform: scale(1.1);
+}
+
+.toc-toggle.active {
+    background-color: #e74c3c;
+}
+
+.right-sidebar.collapsed {
+    display: none;
+}
+
+.right-sidebar.collapsed-mobile {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 280px;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 998;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    display: none;
+}
+
+.right-sidebar.collapsed-mobile.show {
+    display: block;
+}
+
 /* 页脚样式 */
 .site-footer {
     background-color: var(--primary-color);
@@ -273,27 +371,107 @@ h2, h3 {
         height: auto;
     }
 
+    /* 导航栏折叠功能 */
+    .nav-toggle {
+        display: block;
+    }
+    
     .nav-container {
-        flex-direction: column;
-        text-align: center;
+        flex-wrap: wrap;
     }
     
     .nav-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
         margin-top: 1rem;
-        flex-wrap: wrap;
-        justify-content: center;
+        gap: 0;
+        background-color: #fff;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+    }
+    
+    .nav-links.active {
+        display: flex;
     }
     
     .nav-links li {
-        margin: 0.3rem;
+        width: 100%;
+        margin: 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .nav-links li:last-child {
+        border-bottom: none;
+    }
+    
+    .nav-links li a {
+        padding: 1rem;
+        width: 100%;
+        text-align: left;
     }
     
     .main-container {
         padding: 0 0.5rem;
+        flex-direction: column;
     }
     
-    .sidebar,
+    /* 手机端：主内容区域优先显示，减少遮挡 */
     .main-content {
+        order: 1;
+        width: 100%;
         padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* 手机端：left-sidebar放到正文后面 */
+    .left-sidebar {
+        order: 2;
+        width: 100%;
+        padding: 1rem;
+        position: relative;
+        top: auto;
+        margin-bottom: 1rem;
+    }
+    
+    /* 手机端：right-sidebar默认隐藏，通过按钮控制 */
+    .right-sidebar {
+        order: 3;
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 280px;
+        max-width: calc(100vw - 40px);
+        max-height: 60vh;
+        overflow-y: auto;
+        z-index: 998;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        display: none !important;
+        padding: 1rem;
+    }
+    
+    .right-sidebar.show {
+        display: block !important;
+    }
+    
+    /* 目录收缩按钮在手机端显示 */
+    .toc-toggle {
+        display: flex;
+    }
+    
+    .sidebar {
+        position: relative;
+        top: auto;
+        max-height: none;
+    }
+    
+    /* 优化常用链接在手机端的显示 */
+    .common-links {
+        gap: 0.3rem;
+    }
+    
+    .common-links a {
+        padding: 0.5rem;
+        font-size: 0.9rem;
     }
 }

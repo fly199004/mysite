@@ -6,15 +6,17 @@
     <title>{% block title %}小飞老师{% endblock %}</title>
     <!-- <link rel="stylesheet" href="https://site-1314099117.cos.ap-guangzhou.myqcloud.com/css/base.css"> -->
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}?v=20250107">
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>    
     <nav class="top-nav">
         <div class="nav-container">
-
-            <ul class="nav-links">
+            <button class="nav-toggle" id="nav-toggle" aria-label="切换导航菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="nav-links">
                 <li><a href="/"><i class="fas fa-home"></i> 首页</a></li>
                 <li><a href="/tech"><i class="fas fa-code"></i> IT记录</a></li>
                 <li><a href="/teach"><i class="fas fa-chalkboard-teacher"></i> IT教学</a></li>
@@ -51,6 +53,39 @@
                         {% block article_list %}{% endblock %}
                     </div>
                 </div>
+                
+                <div class="section-box">
+                    <h3 class="section-title"><i class="fas fa-link"></i> 常用网站链接</h3>
+                    <div class="common-links">
+                        <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手">
+                            <i class="fas fa-robot"></i> 豆包
+                        </a>
+                        <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台">
+                            <i class="fas fa-book-open"></i> 超星
+                        </a>
+                        <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台">
+                            <i class="fab fa-tiktok"></i> 抖音
+                        </a>
+                        <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区">
+                            <i class="fas fa-brain"></i> AIGC
+                        </a>
+                        <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具">
+                            <i class="fas fa-project-diagram"></i> 迅捷画图
+                        </a>
+                        <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库">
+                            <i class="fas fa-book"></i> 知网
+                        </a>
+                        <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台">
+                            <i class="fab fa-bilibili"></i> 哔哩哔哩
+                        </a>
+                        <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区">
+                            <i class="fas fa-code"></i> CSDN
+                        </a>
+                        <a href="http://nas.liufeisheng.cn" target="_blank" title="NAS - 网络存储">
+                            <i class="fas fa-server"></i> NAS
+                        </a>
+                    </div>
+                </div>
             </div>
             {% endblock %}
         </aside>
@@ -60,7 +95,7 @@
             {% endblock %}
         </main>
 
-        <aside class="sidebar right-sidebar">
+        <aside class="sidebar right-sidebar" id="right-sidebar">
             {% block right %}
             <div class="sidebar-section">
                 <div class="section-box">
@@ -79,14 +114,131 @@
             </div>
             {% endblock %}
         </aside>
+        
+        <!-- 目录收缩按钮（手机端显示） -->
+        <button class="toc-toggle" id="toc-toggle" aria-label="切换目录">
+            <i class="fas fa-list"></i>
+        </button>
     </div>
     
     {% block script %}
+    <script>
+        // 导航栏折叠功能（手机端）
+        (function() {
+            const navToggle = document.getElementById('nav-toggle');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (navToggle && navLinks) {
+                navToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    const icon = this.querySelector('i');
+                    if (navLinks.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                // 点击导航链接后关闭菜单
+                navLinks.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A' && window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                        const icon = navToggle.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            }
+        })();
+        
+        // 右侧边栏收缩功能（手机端）
+        (function() {
+            const tocToggle = document.getElementById('toc-toggle');
+            const rightSidebar = document.getElementById('right-sidebar');
+            
+            if (tocToggle && rightSidebar) {
+                // 检查是否有内容（目录或其他内容）
+                const hasContent = rightSidebar.innerHTML.trim() !== '' && 
+                                   rightSidebar.querySelector('.sidebar-section');
+                
+                // 只在手机端且有内容时显示按钮
+                function checkMobile() {
+                    if (window.innerWidth <= 768 && hasContent) {
+                        tocToggle.style.display = 'flex';
+                        // 默认隐藏右侧边栏
+                        if (!rightSidebar.classList.contains('show')) {
+                            rightSidebar.style.display = 'none';
+                        }
+                    } else {
+                        tocToggle.style.display = 'none';
+                        rightSidebar.classList.remove('show');
+                        rightSidebar.style.display = '';
+                    }
+                }
+                
+                // 初始检查
+                checkMobile();
+                
+                // 窗口大小改变时检查
+                window.addEventListener('resize', checkMobile);
+                
+                // 滚动时自动隐藏右侧边栏
+                let lastScrollTop = 0;
+                let scrollTimeout;
+                
+                window.addEventListener('scroll', function() {
+                    if (window.innerWidth <= 768 && hasContent) {
+                        clearTimeout(scrollTimeout);
+                        
+                        const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        
+                        // 向下滚动时隐藏
+                        if (currentScrollTop > lastScrollTop && currentScrollTop > 100) {
+                            rightSidebar.classList.remove('show');
+                            rightSidebar.style.display = 'none';
+                        }
+                        
+                        lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
+                    }
+                });
+                
+                // 点击按钮切换右侧边栏显示
+                tocToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isShowing = rightSidebar.classList.contains('show');
+                    if (isShowing) {
+                        rightSidebar.classList.remove('show');
+                        rightSidebar.style.display = 'none';
+                        this.classList.remove('active');
+                    } else {
+                        rightSidebar.classList.add('show');
+                        rightSidebar.style.display = 'block';
+                        this.classList.add('active');
+                    }
+                });
+                
+                // 点击外部区域关闭右侧边栏
+                document.addEventListener('click', function(event) {
+                    if (window.innerWidth <= 768 && hasContent) {
+                        if (!rightSidebar.contains(event.target) && 
+                            !tocToggle.contains(event.target) && 
+                            rightSidebar.classList.contains('show')) {
+                            rightSidebar.classList.remove('show');
+                            rightSidebar.style.display = 'none';
+                            tocToggle.classList.remove('active');
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
     {% endblock %}
 
     <footer class="site-footer">
         <div class="footer-content">
-            <p>&copy;2024 小飞老师 <a href="http://beian.miit.gov.cn" style="color: aliceblue;"> 粤ICP备2024204428号</a></p>
+            <p>&copy;2024 刘飞生 <a href="http://beian.miit.gov.cn" style="color: aliceblue;"> 粤ICP备2024204428号</a></p>
         </div>
     </footer>
 </body>
