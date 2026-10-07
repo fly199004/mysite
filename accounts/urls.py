@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('password/', views.password_change, name='password_change'),
     path('password/done/', views.password_change_done, name='password_change_done'),
+    path('api/me/', views.api_me, name='api_me'),
     path('manage/', views.user_list, name='user_list'),
     path('manage/new/', views.user_create, name='user_create'),
     path('manage/<int:user_id>/toggle/', views.user_toggle_active, name='user_toggle'),

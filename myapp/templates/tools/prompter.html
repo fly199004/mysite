@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>飞云轩提词器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; background:#111; color:#eee; font-family:"Microsoft YaHei",sans-serif; overflow:hidden; }
+
+  #bar {
+    position:fixed; top:0; left:0; right:0; z-index:20;
+    background:#1d1d1d; border-bottom:1px solid #333;
+    padding:10px 12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  }
+  #bar button {
+    border:1px solid #9A0605; background:#9A0605; color:#fff;
+    font-size:15px; padding:9px 18px; border-radius:5px; font-family:inherit;
+  }
+  #bar button.ghost { background:transparent; border-color:#666; color:#ccc; }
+  .ctl { display:flex; align-items:center; gap:6px; font-size:13px; color:#aaa; }
+  .ctl input[type=range] { width:90px; }
+  .ctl input[type=number] { width:56px; background:#2a2a2a; border:1px solid #444; color:#eee; border-radius:4px; padding:5px; font-size:14px; }
+  .speed-hint { color:#777; font-size:12px; white-space:nowrap; }
+
+  #editBox {
+    position:fixed; inset:58px 0 0 0; z-index:15; background:#111; padding:14px;
+  }
+  #editBox textarea {
+    width:100%; height:100%; background:#161616; color:#ddd; border:1px solid #333;
+    border-radius:6px; padding:14px; font-size:16px; line-height:1.8; resize:none; font-family:inherit;
+  }
+
+  #prompter {
+    position:fixed; inset:58px 0 0 0; z-index:10; display:none; overflow-y:auto;
+    background:#000; scroll-behavior:auto;
+  }
+  #inner {
+    padding:45vh 6vw 60vh; font-size:44px; line-height:2.1; white-space:pre-wrap;
+    letter-spacing:1px; color:#f5f5f5;
+  }
+  #inner .cue { color:#e0594f; font-size:.62em; display:block; margin:.35em 0; letter-spacing:0; }
+  /* prosody markers */
+  #inner .stress { color:#ff4d4d; font-weight:bold; }
+  #inner .rise, #inner .fall { font-size:.72em; font-weight:bold; vertical-align:.08em; padding:0 .06em; }
+  #inner .rise { color:#42d4f4; }
+  #inner .fall { color:#9aa7ff; }
+  #inner .pause { color:#9a9a9a; font-size:.7em; vertical-align:.05em; padding:0 .05em; letter-spacing:-.05em; }
+  /* center reading marker line */
+  #marker {
+    position:fixed; left:0; right:0; top:calc(58px + 38vh); height:2px; z-index:11;
+    background:rgba(224,89,79,.55); display:none; pointer-events:none;
+  }
+  .mirror { transform: scaleX(-1); }
+</style>
+</head>
+<body>
+
+<div id="bar">
+  <button id="btnStart">开始</button>
+  <button id="btnReset" class="ghost">重置</button>
+  <button id="btnMirror" class="ghost">镜像</button>
+  <div class="ctl">速度
+    <input id="speed" type="range" min="10" max="160" value="45">
+    <input id="speedNum" type="number" min="10" max="160" value="45">
+    <span class="speed-hint">默认45 · 推荐45-65</span>
+  </div>
+  <div class="ctl">字号 <input id="fsize" type="number" min="24" max="96" value="44"></div>
+  <button id="btnEdit" class="ghost">改稿</button>
+</div>
+
+<div id="editBox"><textarea id="txt"></textarea></div>
+<div id="prompter"><div id="inner"></div></div>
+<div id="marker"></div>
+
+<script>
+var defaultScript = [
+"一个八岁男孩，后来成了百万富翁。\n但他最重要的一刻，\n并不是赚到第一笔钱。",
+"※举书到胸前※",
+"我最近读完这本《小狗钱钱》。\n书的主人公，\n是一个十二岁的女孩，叫吉娅。\n她有一只会说话的小狗，叫钱钱。\n下面这个男孩的故事，\n就是钱钱讲给吉娅听的。",
+"男孩叫达瑞，八岁，\n想看电影，兜里没有钱。\n一个成功商人给了他两条建议：\n第一，帮别人解决一个难题，\n你就能赚到钱；\n第二，把精力放在你知道的、\n你会做的、你拥有的东西上。",
+"※切书页特写，声音继续※",
+"达瑞发现，\n邻居冬天出门取报纸特别麻烦，\n就挨家挨户送报上门，\n很快有了七十多个顾客。\n后来又加了代扔垃圾、照看宠物，\n还雇别的孩子帮忙，\n长大以后出了书，\n成了百万富翁。",
+"※回到人脸※",
+"但书里说，\n达瑞真正的转折点，\n不是赚到钱的那一刻，\n而是他坐下来认真盘点：\n我知道什么、能做什么、拥有什么——\n就是那一刻。",
+"※金句卡停顿3秒，不说话※",
+"我们多数人想赚钱、想做副业，\n注意力全在“我没有什么”：\n没本钱、没人脉、没技能，\n越想越不敢动。\n今天拿张纸分三栏，\n每栏至少写三条。",
+"你身上有什么一直被忽略的资源？\n评论区告诉我。"
+].join("\n\n");
+
+var txt = document.getElementById('txt');
+txt.value = defaultScript;
+
+var prompter = document.getElementById('prompter');
+var inner = document.getElementById('inner');
+var editBox = document.getElementById('editBox');
+var marker = document.getElementById('marker');
+var running = false, raf = null, lastT = 0;
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function isMetaLine(t) {
+  // header / legend lines that must not be shown while prompting
+  return /Teleprompter Script/i.test(t)
+      || /^Prosody markers:/.test(t)
+      || /^\(Lines with/.test(t);
+}
+function isCueLine(t) {
+  return /^※[\s\S]*※$/.test(t) || /^\[.*\]$/.test(t);
+}
+function cueText(t) {
+  return t.replace(/※/g,'').replace(/^\[|\]$/g,'');
+}
+function inlineMarks(s) {
+  return s
+    .replace(/\*\*([^*]+?)\*\*/g, '<span class="stress">$1</span>')
+    .replace(/⏸⏸/g, '<span class="pause">⏸⏸</span>')
+    .replace(/⏸/g, '<span class="pause">⏸</span>')
+    .replace(/↗/g, '<span class="rise">↗</span>')
+    .replace(/↘/g, '<span class="fall">↘</span>');
+}
+function renderScript() {
+  var lines = escHtml(txt.value).split('\n');
+  var kept = [];
+  lines.forEach(function(line){
+    var t = line.trim();
+    if (isMetaLine(t)) return;                 // hide title & legend
+    if (isCueLine(t)) { kept.push('<span class="cue">' + inlineMarks(cueText(t)) + '</span>'); return; }
+    kept.push(inlineMarks(line));
+  });
+  inner.innerHTML = kept.join('\n');
+}
+
+function setFont(){ inner.style.fontSize = document.getElementById('fsize').value + 'px'; }
+document.getElementById('fsize').addEventListener('change', setFont);
+
+function start() {
+  if (!running) {
+    editBox.style.display = 'none';
+    prompter.style.display = 'block';
+    marker.style.display = 'block';
+    renderScript(); setFont();
+    running = true; lastT = 0;
+    document.getElementById('btnStart').textContent = '暂停';
+    if (screenfullSupport()) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(function(){});
+    raf = requestAnimationFrame(tick);
+  } else {
+    running = false;
+    document.getElementById('btnStart').textContent = '继续';
+    cancelAnimationFrame(raf);
+  }
+}
+function screenfullSupport(){ return true; }
+
+function tick(t) {
+  if (!running) return;
+  if (!lastT) lastT = t;
+  var dt = (t - lastT)/1000; lastT = t;
+  var speed = +document.getElementById('speed').value; // px per second
+  prompter.scrollTop += speed * dt;
+  if (prompter.scrollTop + prompter.clientHeight >= inner.scrollHeight) {
+    running = false;
+    document.getElementById('btnStart').textContent = '开始';
+    return;
+  }
+  raf = requestAnimationFrame(tick);
+}
+
+function reset() {
+  running = false; cancelAnimationFrame(raf);
+  prompter.scrollTop = 0;
+  document.getElementById('btnStart').textContent = '开始';
+}
+
+document.getElementById('btnStart').addEventListener('click', start);
+document.getElementById('btnReset').addEventListener('click', reset);
+
+// ===== 速度滑块与数字框双向同步 =====
+var speedEl = document.getElementById('speed');
+var speedNumEl = document.getElementById('speedNum');
+function clampSpeed(v){ v = parseInt(v,10); if (isNaN(v)) v = 55; return Math.min(160, Math.max(10, v)); }
+speedEl.addEventListener('input', function(){ speedNumEl.value = speedEl.value; });
+speedNumEl.addEventListener('input', function(){
+  var v = speedNumEl.value;
+  if (v !== '' && !isNaN(+v)) speedEl.value = clampSpeed(v);
+});
+speedNumEl.addEventListener('change', function(){ speedNumEl.value = clampSpeed(speedNumEl.value); speedEl.value = speedNumEl.value; });
+document.getElementById('btnEdit').addEventListener('click', function(){
+  running = false; cancelAnimationFrame(raf);
+  prompter.style.display='none'; marker.style.display='none';
+  editBox.style.display='block';
+  document.getElementById('btnStart').textContent='开始';
+});
+document.getElementById('btnMirror').addEventListener('click', function(){
+  inner.classList.toggle('mirror');
+});
+
+// tap prompter to pause/resume
+prompter.addEventListener('click', function(){ start(); });
+</script>
+
+<script>
+/* ===== 工具使用门控：未登录免费 5 次，登录后无限 ===== */
+(function(){
+  var TOOL_KEY='prompter', FREE_LIMIT=5;
+  var IS_AUTH = false;    /* 由 /accounts/api/me/ 更新 */
+  var LOGIN_URL='/accounts/login/?next='+encodeURIComponent(location.pathname);
+  fetch('/accounts/api/me/',{credentials:'same-origin'})
+    .then(function(r){return r.json();})
+    .then(function(d){ IS_AUTH = false; refreshTag(); }).catch(function(){});
+
+  function getU(){ return parseInt(localStorage.getItem('tool_usage_'+TOOL_KEY)||'0',10)||0; }
+  function addU(){ localStorage.setItem('tool_usage_'+TOOL_KEY, getU()+1); }
+  function remain(){ return Math.max(0, FREE_LIMIT-getU()); }
+  function css(t){ var s=document.createElement('style'); s.textContent=t; document.head.appendChild(s); }
+  css('#__gateMask{display:none;position:fixed;inset:0;background:rgba(20,28,45,.5);z-index:99999}.__gate{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;padding:28px 30px;width:380px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.3);z-index:100000;display:none;text-align:center;font-family:"Microsoft YaHei",sans-serif}.__gate .lk{font-size:40px}.__gate h3{margin:12px 0 8px;color:#243044}.__gate p{color:#5c6880;font-size:14px;line-height:1.7;margin-bottom:18px}.__gate a.gb{display:block;background:#9A0605;color:#fff;text-decoration:none;border-radius:8px;padding:12px;font-size:15px}.__gate a.lt{display:inline-block;margin-top:12px;color:#93a0b5;font-size:13px}#__usageTag{font-size:13px;font-weight:600;margin-left:10px}');
+  function show(){
+    document.getElementById('__gateMask').style.display='block';
+    document.getElementById('__gateBox').style.display='block';
+  }
+  function hide(){
+    document.getElementById('__gateMask').style.display='none';
+    document.getElementById('__gateBox').style.display='none';
+  }
+  function init(){
+    var mask=document.createElement('div'); mask.id='__gateMask';
+    var box=document.createElement('div'); box.className='__gate'; box.id='__gateBox';
+    box.innerHTML='<div class="lk">🔒</div><h3>免费次数已用完</h3>'
+      +'<p>本工具未登录可免费使用 5 次，您已用完。登录账号后即可继续无限次使用。</p>'
+      +'<a class="gb" href="'+LOGIN_URL+'">前往登录</a>'
+      +'<a class="lt" href="javascript:void(0)">稍后再说</a>';
+    box.querySelector('.lt').addEventListener('click', hide);
+    mask.addEventListener('click', hide);
+    document.body.appendChild(mask); document.body.appendChild(box);
+    var anchor=document.getElementById('btnEdit');
+    if(anchor && anchor.parentNode){
+      var span=document.createElement('span'); span.id='__usageTag';
+      anchor.parentNode.appendChild(span);
+    }
+    refreshTag();
+  }
+  function refreshTag(){
+    var t=document.getElementById('__usageTag');
+    if(!t) return;
+    if(IS_AUTH){ t.textContent='已登录 · 不限次'; t.style.color='#2f9e6e'; }
+    else { var r=remain();
+      t.textContent = r>0 ? ('未登录 · 还可免费 '+r+' 次') : '未登录 · 请登录';
+      t.style.color = r>0 ? '#d9a441' : '#c0392b';
+    }
+  }
+  function consume(){
+    if(IS_AUTH) return true;
+    if(getU() >= FREE_LIMIT){ show(); return false; }
+    addU(); refreshTag(); return true;
+  }
+  window.__toolConsume = consume;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  /* === 捕获阶段拦截目标动作 === */
+  document.addEventListener('click', function(e){
+    var b=document.getElementById('btnStart');
+    var onStart = b && (e.target===b || b.contains(e.target)) && b.textContent.trim()==='开始';
+    var onPrompter = e.target && e.target.id==='prompter' && !window.running;
+    if(onStart || onPrompter){
+      if(!window.__toolConsume()){ e.stopPropagation(); e.preventDefault(); }
+    }
+  }, true);
+})();
+</script>
+
+</body>
+</html>

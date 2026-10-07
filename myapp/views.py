@@ -25,6 +25,19 @@ def me(request):
 def datav(request):
     return render(request, 'datav.html')
 
+# ---------------- 在线工具 ----------------
+def tool_knowmap(request):
+    """通用知识图谱生成器（不限学科）。"""
+    return render(request, 'tools/knowmap.html')
+
+def tool_label_generator(request):
+    """二维码标签生成器（免费5次，之后需登录）。"""
+    return render(request, 'tools/label_generator.html')
+
+def tool_prompter(request):
+    """飞云轩提词器（免费5次，之后需登录）。"""
+    return render(request, 'tools/prompter.html')
+
 def article_view(request, category=None, article_id=None, template_name='articles.html'):
     manager = Article()
     

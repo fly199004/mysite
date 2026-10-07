@@ -20,5 +20,10 @@ urlpatterns = [
     path('datav/', views.datav, name='datav'),
     path('aboutme/', views.me, name='me'),
     path('c/aboutme/', views.me, name='me'),
-    path('dh/',views.dh,name='dh')
+    path('dh/',views.dh,name='dh'),
+
+    # ---------------- 在线工具 ----------------
+    path('tools/knowmap/', views.tool_knowmap, name='tool_knowmap'),
+    path('tools/label/', views.tool_label_generator, name='tool_label'),
+    path('tools/prompter/', views.tool_prompter, name='tool_prompter'),
 ]

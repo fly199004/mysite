@@ -75,6 +75,17 @@ def password_change_done(request):
     return render(request, 'accounts/password_change_done.html')
 
 
+# ---------------- 登录态查询（GET 公开） ----------------
+def api_me(request):
+    """供前端工具判断是否已登录；GET 免登录。"""
+    u = request.user
+    return JsonResponse({
+        'authenticated': bool(u.is_authenticated),
+        'username': u.username if u.is_authenticated else '',
+        'is_staff': bool(u.is_authenticated and (u.is_staff or u.is_superuser)),
+    })
+
+
 # ---------------- 管理员：用户列表 / 新建 / 启停 / 删除 / 重置密码 ----------------
 @admin_required
 def user_list(request):
