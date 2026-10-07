@@ -14,7 +14,6 @@ import sys
 # Create your views here.
 
 
-@login_required
 def photo_list(request):
     # 获取标签过滤参数
     tag_id = request.GET.get('tag')
@@ -48,16 +47,20 @@ def photo_list(request):
         'current_tag': tag_id
     })
 
-@login_required
 def photo_detail(request, pk):
     photo = get_object_or_404(Photo, pk=pk)
-    
-    # 检查用户权限
-    if not request.user.is_superuser and request.user.username not in ['fei', 'sisi','user1', 'user2', 'user3'] and photo.user != request.user:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'error': '您没有权限编辑此照片'})
-        return redirect('photo:photo_list')
-    
+
+    # POST（修改）必须登录且为本人或管理员
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'detail': '需要登录'}, status=401)
+            return redirect('/accounts/login/?next=' + request.path)
+        if not request.user.is_superuser and request.user.username not in ['fei', 'sisi', 'user1', 'user2', 'user3'] and photo.user != request.user:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': '您没有权限编辑此照片'})
+            return redirect('photo:photo_list')
+
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         # 更新照片信息
         title = request.POST.get('title')

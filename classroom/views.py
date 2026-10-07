@@ -1,12 +1,14 @@
-"""课堂点名积分：页面 + JSON 接口。"""
+"""课堂点名积分：页面 + JSON 接口。
+查询（GET）免登录；所有写操作必须登录（accounts 中间件兜底 + login_required）。"""
 import json
 import secrets
 import time
 
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_http_methods
 
 from .models import Classroom, Current
 
@@ -48,40 +50,19 @@ def _json_body(request):
         return {}
 
 
-def _authorized(request):
-    token = getattr(settings, "CLASSROOM_TOKEN", "")
-    if not token:
-        # 未配置口令时默认放行（不建议生产这样）
-        return True
-    auth = request.headers.get("Authorization", "")
-    if auth.startswith("Bearer "):
-        supplied = auth[7:].strip()
-    else:
-        supplied = request.headers.get("X-Admin-Token", "").strip()
-    return secrets.compare_digest(supplied, str(token))
-
-
-def _unauthorized():
-    return JsonResponse({"detail": "口令不正确或缺失"}, status=401)
-
-
 def index(request):
     """课堂点名页面。"""
     return render(request, "classroom/index.html", {})
 
 
+@require_http_methods(["GET"])
 def list_classes(request):
-    if request.method != "GET":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
     return JsonResponse(_all_payload())
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["POST"])
 def create_class(request):
-    if request.method != "POST":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     data = _json_body(request)
     name = str(data.get("name", "")).strip()
     if not name:
@@ -94,12 +75,9 @@ def create_class(request):
     return JsonResponse(_room_payload(room))
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["PUT"])
 def rename_class(request, class_id):
-    if request.method != "PUT":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     data = _json_body(request)
     try:
         room = Classroom.objects.using("classroom").get(class_id=class_id)
@@ -116,12 +94,9 @@ def rename_class(request, class_id):
     return JsonResponse({"ok": True})
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["PUT"])
 def state_class(request, class_id):
-    if request.method != "PUT":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     data = _json_body(request)
     try:
         room = Classroom.objects.using("classroom").get(class_id=class_id)
@@ -133,12 +108,9 @@ def state_class(request, class_id):
     return JsonResponse({"ok": True})
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["DELETE"])
 def delete_class(request, class_id):
-    if request.method != "DELETE":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     deleted, _ = Classroom.objects.using("classroom").filter(class_id=class_id).delete()
     if not deleted:
         return JsonResponse({"detail": "班级不存在"}, status=404)
@@ -148,12 +120,9 @@ def delete_class(request, class_id):
     return JsonResponse({"ok": True})
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["PUT"])
 def current(request):
-    if request.method != "PUT":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     data = _json_body(request)
     cid = str(data.get("currentClassId", "")).strip()
     if cid and not Classroom.objects.using("classroom").filter(class_id=cid).exists():
@@ -162,12 +131,9 @@ def current(request):
     return JsonResponse({"ok": True})
 
 
-@csrf_exempt
+@login_required(login_url="/accounts/login/")
+@require_http_methods(["POST"])
 def replace_all(request):
-    if request.method != "POST":
-        return JsonResponse({"detail": "方法不允许"}, status=405)
-    if not _authorized(request):
-        return _unauthorized()
     data = _json_body(request)
     classes = data.get("classes")
     if not isinstance(classes, list):

@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'myapp',  # 主站应用
     'photo',  # 相册应用
     'classroom',  # 课堂点名积分（独立 SQLite）
+    'accounts',  # 全站账号与登录
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'accounts.middleware.LoginRequiredMiddleware',  # 全站：写操作需登录
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -104,6 +106,19 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 USE_MONGO = os.getenv('USE_MONGO', 'False').lower() == 'true'
 
 CLASSROOM_DB_PATH = BASE_DIR / 'classroom.sqlite'
+ACCOUNTS_DB_PATH = BASE_DIR / 'accounts.sqlite'
+
+# 账号体系（auth / admin / contenttypes / sessions / accounts）统一走
+# 独立的标准 SQLite（accounts），彻底避开 djongo 的兼容问题。
+# 课堂点名数据走 classroom SQLite；主站业务数据走默认库（MongoDB）。
+_AUTH_SQLITE = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': ACCOUNTS_DB_PATH,
+}
+_CLASSROOM_SQLITE = {
+    'ENGINE': 'django.db.backends.sqlite3',
+    'NAME': CLASSROOM_DB_PATH,
+}
 
 if USE_MONGO:
     DATABASES = {
@@ -115,10 +130,8 @@ if USE_MONGO:
                 'host': 'mongodb://172.17.0.1:27017/vanBlog'
             }
         },
-        'classroom': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': CLASSROOM_DB_PATH,
-        }
+        'accounts': _AUTH_SQLITE,
+        'classroom': _CLASSROOM_SQLITE,
     }
 else:
     DATABASES = {
@@ -126,17 +139,20 @@ else:
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         },
-        'classroom': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': CLASSROOM_DB_PATH,
-        }
+        'accounts': _AUTH_SQLITE,
+        'classroom': _CLASSROOM_SQLITE,
     }
 
-# 课堂点名数据只迁移、读写到独立 SQLite，与主站库完全隔离
-DATABASE_ROUTERS = ['classroom.db_router.ClassroomRouter']
+# 数据库路由（顺序敏感）：先账号库，再课堂库
+DATABASE_ROUTERS = [
+    'accounts.db_router.AccountsRouter',
+    'classroom.db_router.ClassroomRouter',
+]
 
-# 课堂点名写操作口令（在 docker-compose.yml 的环境变量中设置）
-CLASSROOM_TOKEN = os.getenv('CLASSROOM_TOKEN', '')
+# 全站登录配置
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 
 
@@ -148,12 +164,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
@@ -162,9 +172,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 

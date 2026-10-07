@@ -270,6 +270,7 @@
 </style>
 </head>
 <body>
+<div style="display:none">{% csrf_token %}</div>
 
 <header>
   <div class="top-actions">
@@ -413,7 +414,20 @@ let root = { currentClassId:null, classes:[] };
 let state = newClassState();
 let seq = 1;
 let restoring = false;
-let authToken = sessionStorage.getItem('admin_token') || '';
+
+/* ---- CSRF（Django Session 认证；Cookie 由 csrftoken 提供） ---- */
+function getCookie(name){
+  let v=null;
+  if(document.cookie && document.cookie!==''){
+    document.cookie.split(';').forEach(c=>{
+      c=c.trim();
+      if(c.substring(0,name.length+1)===(name+'=')){
+        v=decodeURIComponent(c.substring(name.length+1));
+      }
+    });
+  }
+  return v;
+}
 
 function newClassState(){
   return {
@@ -423,17 +437,26 @@ function newClassState(){
   };
 }
 
-/* ---------- 网络封装 ---------- */
+/* ---------- 网络封装（Session 登录 + CSRF） ---------- */
 async function api(path, options={}){
-  const opts = Object.assign({headers:{}}, options);
+  const method = (options.method||'GET').toUpperCase();
+  const opts = Object.assign({credentials:'same-origin'}, options);
+  opts.headers = Object.assign({}, options.headers);
   opts.headers['Content-Type'] = 'application/json';
-  if(authToken) opts.headers['Authorization'] = 'Bearer '+authToken;
+  opts.headers['X-Requested-With'] = 'XMLHttpRequest';
+  // 写操作需要带 CSRF Token
+  if(['POST','PUT','PATCH','DELETE'].includes(method)){
+    const csrf = getCookie('csrftoken') || window.CSRF_TOKEN;
+    if(csrf) opts.headers['X-CSRFToken'] = csrf;
+  }
   let res;
   try{ res = await fetch(path, opts); }
   catch(e){ throw {status:0, message:'无法连接服务器'}; }
   if(res.status===401){
-    askToken();
-    throw {status:401, message:'需要口令'};
+    // 未登录：跳转登录页，登录后回到当前页面
+    window.location.href = '/accounts/login/?next='
+      + encodeURIComponent(window.location.pathname);
+    throw {status:401, message:'需要登录'};
   }
   if(!res.ok){
     let detail='请求失败';
@@ -442,10 +465,6 @@ async function api(path, options={}){
   }
   if(res.status===204) return null;
   return res.json();
-}
-function askToken(){
-  const t = prompt('请输入管理口令（加减分/导入等操作需要）：');
-  if(t){ authToken=t.trim(); sessionStorage.setItem('admin_token',authToken); }
 }
 
 /* ---------- 保存到后端（当前班级整表，防抖） ---------- */

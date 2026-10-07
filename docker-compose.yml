@@ -10,9 +10,8 @@ services:
       - ./staticfiles:/app/staticfiles
     environment:
       - USE_MONGO=true
-      - CLASSROOM_TOKEN=${CLASSROOM_TOKEN:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     # 新增：容器退出就自动重启
     restart: always
-    command: sh -c "python manage.py migrate classroom --database=classroom && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python manage.py migrate --database=accounts && python manage.py migrate classroom --database=classroom && python manage.py ensure_admin && python manage.py runserver 0.0.0.0:8000"

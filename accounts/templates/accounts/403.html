@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>无权限</title><style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;
+       background:linear-gradient(135deg,#0d0f16 0%,#1a1f2e 55%,#0d0f16 100%);
+       min-height:100vh;color:#e8eaf0;display:flex;align-items:center;justify-content:center;padding:20px}
+  .acc-card{width:100%;max-width:430px;background:#151a26;border:1px solid rgba(217,180,90,.35);
+       border-radius:18px;padding:34px 32px;box-shadow:0 20px 60px rgba(0,0,0,.55)}
+  .acc-card.wide{max-width:860px}
+  .acc-brand{text-align:center;margin-bottom:6px;font-size:24px;font-weight:800;
+       background:linear-gradient(90deg,#f0d78c,#d9b45a);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .acc-sub{text-align:center;color:#9aa3b5;font-size:14px;margin-bottom:24px}
+  .acc-field{margin-bottom:16px}
+  .acc-field label{display:block;margin-bottom:7px;font-size:14px;font-weight:600;color:#c8cfdd}
+  .acc-input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid #333b4d;
+       background:#0e121c;color:#eef1f6;font-size:15px;outline:none;transition:.15s}
+  .acc-input:focus{border-color:#d9b45a;box-shadow:0 0 0 3px rgba(217,180,90,.15)}
+  .acc-help{font-size:12px;color:#8590a3;margin-top:5px}
+  .acc-errorlist{list-style:none;padding:10px 12px;background:rgba(220,70,70,.12);
+       border:1px solid rgba(220,70,70,.4);border-radius:8px;color:#ff9a9a;font-size:13px;margin:0 0 16px}
+  .acc-btn{width:100%;padding:12px;border:none;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;
+       background:linear-gradient(90deg,#e6c56f,#c9a13f);color:#1a1407}
+  .acc-btn:hover{filter:brightness(1.07)}
+  .acc-msgs .m{padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:12px}
+  .m-success{background:rgba(60,170,110,.14);border:1px solid rgba(60,170,110,.4);color:#8fe0b0}
+  .m-info{background:rgba(90,130,220,.14);border:1px solid rgba(90,130,220,.4);color:#a9c2f5}
+  .m-error{background:rgba(220,70,70,.14);border:1px solid rgba(220,70,70,.4);color:#ff9a9a}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+  th{color:#c8cfdd;font-weight:700}
+  .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:12px}
+  .tag-adm{background:rgba(217,180,90,.18);color:#e6c56f}
+  .tag-off{background:rgba(200,80,80,.15);color:#ff9a9a}
+  .tag-norm{background:rgba(120,140,170,.15);color:#b9c2d4}
+  .a-btn{display:inline-block;padding:5px 10px;border-radius:7px;font-size:12px;text-decoration:none;margin-right:4px}
+  .a-reset{background:#2b3346;color:#cfd7e8}
+  .a-warn{background:#5a2e2e;color:#ffb0b0}
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+  .top-row h2{margin:0;font-size:20px}
+  .new-btn{padding:9px 16px;border-radius:9px;text-decoration:none;font-weight:700;font-size:14px;
+       background:linear-gradient(90deg,#e6c56f,#c9a13f);color:#1a1407}
+  .back-link{color:#c8cfdd;text-decoration:none;font-size:13px}
+</style></head><body><div class="acc-card">
+<div class="acc-brand">无访问权限</div>
+<div class="acc-sub">您的账号没有权限访问“账号管理”页面。</div>
+<div style="text-align:center"><a class="back-link" href="/">← 返回首页</a></div>
+</div></body></html>
