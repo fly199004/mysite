@@ -30,6 +30,13 @@ SECRET_KEY = 'django-insecure-!t0sdac3zjtqxq5c0543v(vf5gyb@4clo02(3@gm6&w$1!782p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# 1. 信任 Nginx 代理的 X-Forwarded-* 头
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+# 2. 修复路径前缀问题（核心！）
+FORCE_SCRIPT_NAME = None  # 禁止 Django 自动添加前缀
+
 ALLOWED_HOSTS = [
     'www.liufeisheng.cn',
     'blog.liufeisheng.cn',

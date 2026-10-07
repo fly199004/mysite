@@ -58,4 +58,4 @@ def tech(request, article_id=None):
 
 
 def dh(request):
-    return render(request, 'dh.html')
+    return render(request, 'dh/dh.html')

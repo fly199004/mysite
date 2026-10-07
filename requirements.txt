@@ -27,3 +27,4 @@ xmltodict==0.14.2
 zipp==3.15.0
 PILLOW==10.4.0
 
+
