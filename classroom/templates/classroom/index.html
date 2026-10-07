@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课堂点名 · 积分风云榜</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg0:#0a0a0c; --bg1:#121216; --bg2:#1a1a20; --panel:#15151b;
+    --gold:#d9b45a; --gold2:#f0d48a; --gold3:#a8822f;
+    --text:#f3ead6; --sub:#b8ad93; --line:rgba(217,180,90,.28);
+    --red:#c85a5a; --red2:#8f3b3b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Microsoft YaHei","PingFang SC",sans-serif;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, rgba(217,180,90,.10), transparent 60%),
+      linear-gradient(160deg,#0c0c0f 0%, #111116 45%, #0a0a0c 100%);
+    min-height:100vh; overflow-x:hidden;
+  }
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:#0e0e12}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(var(--gold3),var(--gold));border-radius:6px}
+
+  /* ============ 顶部 ============ */
+  header{
+    position:relative; text-align:center; padding:18px 16px 10px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(217,180,90,.07),transparent);
+  }
+  @media (min-width:901px){
+    header{padding-top:66px}
+  }
+  .title-edit{
+    display:inline-block; min-width:320px; max-width:92vw;
+    font-size:clamp(26px,4vw,46px); font-weight:900; letter-spacing:4px;
+    background:linear-gradient(180deg,#f7e6b0,#d9b45a 55%,#9a7426);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 2px 18px rgba(217,180,90,.25);
+    outline:none; border-bottom:2px dashed transparent; padding:2px 10px; cursor:text;
+    line-height:1.25;
+  }
+  .title-edit:focus{border-bottom-color:var(--gold)}
+  .title-tip{font-size:12px;color:var(--sub);margin-top:4px}
+  .top-actions{
+    position:absolute; right:18px; top:18px; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;
+  }
+  .top-actions .btn{padding:8px 12px;font-size:13px}
+
+  .toolbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    justify-content:center; padding:12px 16px; border-bottom:1px solid var(--line);
+    background:rgba(20,20,26,.6);
+  }
+  .class-wrap{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .class-wrap label{font-size:13px;color:var(--sub);white-space:nowrap}
+  #classSelect{
+    background:#0d0d11;border:1px solid var(--gold);color:var(--gold2);
+    border-radius:8px;padding:9px 10px;font-size:14px;font-weight:800;outline:none;
+    cursor:pointer;font-family:inherit;min-width:130px;
+  }
+  #classSelect option{background:#14141a;color:var(--text)}
+  .search-wrap{position:relative; flex:0 1 260px; min-width:200px}
+  .search-wrap input{
+    width:100%; padding:10px 12px 10px 38px; border-radius:10px;
+    background:#0d0d11; border:1px solid var(--line); color:var(--text); font-size:14px; outline:none;
+  }
+  .search-wrap input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(217,180,90,.15)}
+  .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%)}
+  #searchPanel{
+    position:absolute; z-index:40; top:46px; left:0; right:0; display:none;
+    background:#14141a; border:1px solid var(--gold3); border-radius:10px; padding:12px;
+    box-shadow:0 12px 40px rgba(0,0,0,.6);
+  }
+  #searchPanel .sp-name{font-size:20px;font-weight:800;color:var(--gold2)}
+  #searchPanel .sp-meta{color:var(--sub);font-size:13px;margin:4px 0 10px}
+  .sp-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* ============ 按钮 ============ */
+  .btn{
+    appearance:none; cursor:pointer; border:1px solid var(--gold3);
+    background:linear-gradient(180deg,#22222b,#17171d); color:var(--gold2);
+    padding:10px 16px; border-radius:10px; font-size:14px; font-weight:700;
+    transition:.15s; white-space:nowrap; font-family:inherit;
+  }
+  .btn:hover{border-color:var(--gold);box-shadow:0 0 12px rgba(217,180,90,.25);transform:translateY(-1px)}
+  .btn:active{transform:translateY(0)}
+  .btn-gold{background:linear-gradient(180deg,#e8c877,#c69a3e);color:#1a1408;border-color:#f0d48a}
+  .btn-gold:hover{box-shadow:0 0 18px rgba(217,180,90,.45)}
+  .btn-red{border-color:var(--red2);color:#e8a0a0;background:linear-gradient(180deg,#2a1c1c,#1d1414)}
+  .btn-red:hover{border-color:var(--red);box-shadow:0 0 12px rgba(200,90,90,.3)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+  .btn-sm{padding:5px 10px;font-size:12px;border-radius:8px}
+  .btn-ghost{background:transparent}
+
+  input[type=number],input[type=text]{
+    background:#0d0d11;border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:8px 10px;font-size:14px;outline:none;font-family:inherit;
+  }
+  input:focus{border-color:var(--gold)}
+  input[type=number]{width:76px;text-align:center}
+
+  /* ============ 主体布局 ============ */
+  main{
+    display:grid; grid-template-columns:minmax(340px,440px) 1fr; gap:18px;
+    padding:18px; max-width:1500px; margin:0 auto; align-items:start;
+  }
+  @media (min-width:901px){
+    .left-panel{position:sticky; top:14px}
+  }
+  @media (max-width:900px){
+    main{grid-template-columns:1fr}
+    .top-actions{position:static;justify-content:center;margin-top:8px}
+  }
+
+  .panel{
+    background:linear-gradient(180deg,rgba(26,26,33,.92),rgba(17,17,22,.92));
+    border:1px solid var(--line); border-radius:16px; padding:18px;
+    box-shadow:0 10px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(217,180,90,.12);
+  }
+  .panel h2{
+    font-size:16px;color:var(--gold2);letter-spacing:2px;margin-bottom:14px;
+    display:flex;align-items:center;gap:8px;
+    padding-bottom:10px;border-bottom:1px solid var(--line);
+  }
+
+  /* ============ 点名区 ============ */
+  .roll-box{
+    position:relative; height:170px; border-radius:14px; overflow:hidden;
+    background:radial-gradient(400px 160px at 50% 40%,rgba(217,180,90,.14),transparent 70%),#0c0c10;
+    border:1px solid var(--gold3);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:14px;
+  }
+  .roll-box::before,.roll-box::after{
+    content:"";position:absolute;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;
+  }
+  .roll-box::before{top:0}.roll-box::after{bottom:0}
+  #rollName{
+    font-size:clamp(34px,5vw,58px); font-weight:900; letter-spacing:3px; text-align:center;
+    background:linear-gradient(180deg,#f7e6b0,#d9b45a 60%,#9a7426);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    padding:0 12px; word-break:break-all; line-height:1.2;
+  }
+  #rollName.rolling{animation:flicker .12s infinite alternate}
+  @keyframes flicker{from{opacity:.75}to{opacity:1}}
+  #rollName.pop{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+  .roll-info{text-align:center;color:var(--sub);font-size:13px;min-height:20px;margin-bottom:12px}
+  .roll-info b{color:var(--gold2);font-size:16px}
+
+  .slider-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .slider-row label{font-size:13px;color:var(--sub);white-space:nowrap}
+  input[type=range]{
+    -webkit-appearance:none;flex:1;height:6px;border-radius:3px;
+    background:linear-gradient(90deg,#3a2f16,var(--gold));outline:none;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:20px;height:20px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#f7e6b0,#c69a3e);
+    border:1px solid #f0d48a;cursor:pointer;box-shadow:0 0 10px rgba(217,180,90,.5);
+  }
+  #speedVal{color:var(--gold2);font-weight:800;font-size:13px;min-width:74px;text-align:right}
+
+  .amount-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .amount-row label{font-size:13px;color:var(--sub)}
+  .quick-amt{
+    padding:6px 12px;border-radius:8px;border:1px solid var(--line);
+    background:#101015;color:var(--sub);cursor:pointer;font-size:13px;font-family:inherit;
+  }
+  .quick-amt.active{border-color:var(--gold);color:var(--gold2);background:rgba(217,180,90,.12)}
+
+  .roll-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .roll-actions .btn{flex:1;min-width:110px}
+
+  /* ============ 排行榜 ============ */
+  .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:12px;align-items:end;margin-bottom:16px}
+  @media (max-width:520px){
+    .podium{gap:6px}
+    .podium-card{padding:12px 4px 10px;border-radius:10px}
+    .podium-card.first{padding-top:14px}
+    .podium-card .p-name{font-size:14px}
+    .podium-card .p-title{font-size:10.5px}
+    .podium-card .p-score{font-size:18px}
+    .mini-btns button{padding:3px 6px;font-size:11px}
+  }
+  .podium-card{
+    position:relative;text-align:center;border-radius:14px;padding:16px 10px 14px;
+    background:linear-gradient(180deg,#1c1c24,#121218);
+    border:1px solid var(--gold3);
+  }
+  .podium-card .crown{font-size:26px;margin-bottom:2px}
+  .podium-card .p-rank{font-size:12px;letter-spacing:2px;color:var(--sub)}
+  .podium-card .p-name{font-size:clamp(15px,1.6vw,20px);font-weight:800;margin:6px 0 2px;word-break:break-all}
+  .podium-card .p-title{font-size:12px;color:var(--gold2);margin-bottom:6px;min-height:18px}
+  .podium-card .p-score{font-size:22px;font-weight:900;color:var(--gold)}
+  .podium-card.first{
+    border-color:var(--gold); padding-top:22px;
+    background:linear-gradient(180deg,#2a2414,#17130b);
+    box-shadow:0 0 28px rgba(217,180,90,.28);
+    transform:scale(1.04);
+  }
+  .podium-card.blank{opacity:.35;border-style:dashed}
+  .mini-btns{display:flex;gap:6px;justify-content:center;margin-top:8px}
+  .mini-btns button{padding:3px 9px;font-size:12px;border-radius:7px;cursor:pointer;font-family:inherit}
+  .mb-add{border:1px solid var(--gold3);color:var(--gold2);background:#1a1710}
+  .mb-sub{border:1px solid var(--red2);color:#d99;background:#1c1414}
+
+  .rank-list{min-height:120px;padding-right:4px}
+  .rank-row{
+    display:grid;grid-template-columns:46px 1fr auto auto;gap:10px;align-items:center;
+    padding:9px 12px;border-radius:10px;margin-bottom:7px;
+    background:linear-gradient(180deg,#181820,#121217);border:1px solid rgba(217,180,90,.14);
+  }
+  .rank-row .r-no{
+    font-weight:800;color:var(--sub);text-align:center;
+    width:30px;height:30px;line-height:30px;border-radius:50%;
+    border:1px solid var(--line);
+  }
+  .rank-row .r-name{font-weight:700;word-break:break-all}
+  .rank-row .r-title{font-size:11px;color:var(--gold2);display:block;margin-top:2px}
+  .rank-row .r-score{font-weight:900;color:var(--gold2);min-width:56px;text-align:right;font-size:17px}
+  .empty-tip{text-align:center;color:var(--sub);padding:40px 10px;font-size:14px;line-height:2}
+
+  /* ============ 设置弹窗 ============ */
+  .modal-mask{
+    position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;
+    display:none;align-items:center;justify-content:center;padding:16px;
+  }
+  .modal{
+    width:min(560px,96vw);max-height:90vh;overflow-y:auto;
+    background:#15151b;border:1px solid var(--gold);border-radius:16px;padding:22px;
+    box-shadow:0 20px 80px rgba(0,0,0,.7);
+  }
+  .modal h3{color:var(--gold2);margin-bottom:16px;letter-spacing:2px}
+  .form-row{margin-bottom:14px}
+  .form-row label{display:block;font-size:13px;color:var(--sub);margin-bottom:6px}
+  .form-row input{width:100%}
+  .form-row .hint{font-size:12px;color:#7d7560;margin-top:4px}
+  .modal-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+  .class-mgr-row{
+    display:flex;align-items:center;gap:10px;padding:9px 12px;margin-bottom:7px;
+    border:1px solid var(--line);border-radius:10px;
+    background:linear-gradient(180deg,#181820,#121217);flex-wrap:wrap;
+  }
+  .class-mgr-row .cm-name{font-weight:800;flex:1;min-width:110px}
+  .class-mgr-row .cm-info{color:var(--sub);font-size:13px}
+  .class-mgr-row .cm-flag{
+    font-size:11px;color:#1a1408;background:linear-gradient(180deg,#e8c877,#c69a3e);
+    padding:1px 8px;border-radius:10px;margin-left:6px;font-weight:800;
+  }
+
+  /* ============ Toast ============ */
+  #toast{
+    position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+    background:linear-gradient(180deg,#242015,#17140c);border:1px solid var(--gold);
+    color:var(--gold2);padding:11px 22px;border-radius:30px;font-size:14px;font-weight:700;
+    opacity:0;pointer-events:none;transition:.25s;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,.5);
+  }
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .delta-fly{position:fixed;font-weight:900;font-size:22px;pointer-events:none;z-index:150;animation:fly 1s ease forwards}
+  @keyframes fly{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-actions">
+    <button class="btn" onclick="document.getElementById('fileInput').click()">📥 导入名单</button>
+    <button class="btn" onclick="exportExcel()">📋 导出排名</button>
+    <button class="btn" onclick="exportJSON()">💾 备份数据</button>
+    <button class="btn" onclick="document.getElementById('backupInput').click()">📂 恢复备份</button>
+    <button class="btn" onclick="openSettings()">⚙ 设置</button>
+    <button class="btn" onclick="toggleFullscreen()">⛶ 全屏</button>
+  </div>
+  <div id="mainTitle" class="title-edit" contenteditable="true" spellcheck="false">课堂点名 · 积分风云榜</div>
+  <div class="title-tip">点击标题可直接修改 · 数据自动保存在本机浏览器</div>
+  <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+  <input type="file" id="backupInput" accept=".json" style="display:none">
+</header>
+
+<div class="toolbar">
+  <div class="class-wrap">
+    <label>当前班级：</label>
+    <select id="classSelect" onchange="switchToClass(this.value)"></select>
+    <button class="btn btn-sm" onclick="openClassManager()">🗂 班级管理</button>
+  </div>
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d9b45a" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="输入学生姓名，搜索后可直接加减分…" autocomplete="off">
+    <div id="searchPanel">
+      <div class="sp-name" id="spName"></div>
+      <div class="sp-meta" id="spMeta"></div>
+      <div class="sp-btns">
+        <button class="btn btn-sm btn-red" onclick="searchAdjust(-1)">－ 减分</button>
+        <input type="number" id="spAmount" value="2" min="1" step="1">
+        <button class="btn btn-sm btn-gold" onclick="searchAdjust(1)">＋ 加分</button>
+      </div>
+    </div>
+  </div>
+  <button class="btn" id="undoBtn" onclick="undo()">↩ 撤销上一步</button>
+  <button class="btn btn-ghost btn-sm" onclick="loadDemo()">试用演示数据</button>
+  <button class="btn btn-ghost btn-sm btn-red" onclick="clearAll()">清空全部数据</button>
+</div>
+
+<main>
+  <!-- 点名区 -->
+  <section class="panel left-panel">
+    <h2>🎯 随机滚动点名</h2>
+    <div class="roll-box"><div id="rollName">点击开始</div></div>
+    <div class="roll-info" id="rollInfo">名单为空时，可先导入Excel或载入演示数据</div>
+
+    <div class="slider-row">
+      <label>滚动速度</label>
+      <input type="range" id="speedSlider" min="40" max="300" step="10" value="90">
+      <span id="speedVal">快 · 90ms</span>
+    </div>
+
+    <div class="amount-row">
+      <label>单次分值：</label>
+      <button class="quick-amt" data-amt="1">1</button>
+      <button class="quick-amt active" data-amt="2">2</button>
+      <button class="quick-amt" data-amt="5">5</button>
+      <button class="quick-amt" data-amt="10">10</button>
+      <input type="number" id="amountInput" value="2" min="1" step="1">
+    </div>
+
+    <div class="roll-actions">
+      <button class="btn btn-gold" id="startBtn" onclick="toggleRoll()">开始滚动</button>
+      <button class="btn btn-red" id="subBtn" onclick="adjustPicked(-1)" disabled>－ 减分</button>
+      <button class="btn" id="addBtn" onclick="adjustPicked(1)" disabled>＋ 加分</button>
+    </div>
+  </section>
+
+  <!-- 排行榜 -->
+  <section class="panel">
+    <h2>🏆 课堂积分排行榜 <span style="margin-left:auto;font-size:12px;color:var(--sub);font-weight:400" id="countInfo"></span></h2>
+    <div class="podium" id="podium"></div>
+    <div class="rank-list" id="rankList"></div>
+  </section>
+</main>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <h3>⚙ 系统设置</h3>
+    <div class="form-row">
+      <label>班级 / 专业名称（用于生成头衔）</label>
+      <input type="text" id="setMajor" placeholder="如：网络技术 / 新媒体 / 融媒体">
+    </div>
+    <div class="form-row">
+      <label>第 1 名头衔</label>
+      <input type="text" id="setT1" placeholder="如：网络天才 / 新媒体人才 / 融媒体优才">
+    </div>
+    <div class="form-row">
+      <label>第 2 名头衔</label>
+      <input type="text" id="setT2">
+    </div>
+    <div class="form-row">
+      <label>第 3 名头衔</label>
+      <input type="text" id="setT3">
+    </div>
+    <div class="form-row">
+      <label>新导入学生的初始积分</label>
+      <input type="number" id="setInit" value="0" step="1">
+    </div>
+    <div class="form-row hint">提示：头衔可自由填写。若头衔中包含专业名（如“网络天才”），修改专业名后重新保存即可保持一致；也可以直接写成与专业无关的固定头衔（如“学霸至尊”）。</div>
+    <div class="modal-btns">
+      <button class="btn" onclick="closeSettings()">取消</button>
+      <button class="btn btn-gold" onclick="saveSettings()">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- 班级管理弹窗 -->
+<div class="modal-mask" id="classModalMask">
+  <div class="modal">
+    <h3>🗂 班级管理</h3>
+    <div class="form-row">
+      <label>新建班级</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="newClassName" placeholder="如：人工智能1班" style="flex:1">
+        <button class="btn btn-gold" onclick="addClass(document.getElementById('newClassName').value);document.getElementById('newClassName').value=''">＋ 新建</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>全部班级</label>
+      <div id="classManagerList"></div>
+    </div>
+    <div class="form-row hint">各班名单、积分、头衔互相独立，切换班级即切换数据。每个班可单独导出备份；也可在下方一次性导出/恢复全部班级。</div>
+    <div class="form-row" style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="exportAllJSON()">📦 导出全部班级备份</button>
+      <button class="btn btn-sm" onclick="document.getElementById('allBackupInput').click()">📥 恢复全部班级备份</button>
+      <input type="file" id="allBackupInput" accept=".json" style="display:none">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-gold" onclick="closeClassManager()">完成</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============== 数据层（后端 SQLite，内存缓存 + 防抖写入） ============== */
+let root = { currentClassId:null, classes:[] };
+let state = newClassState();
+let seq = 1;
+let restoring = false;
+let authToken = sessionStorage.getItem('admin_token') || '';
+
+function newClassState(){
+  return {
+    title:'课堂点名 · 积分风云榜', major:'',
+    titles:{1:'',2:'',3:''}, initScore:0,
+    students:[], history:[], pickedId:null
+  };
+}
+
+/* ---------- 网络封装 ---------- */
+async function api(path, options={}){
+  const opts = Object.assign({headers:{}}, options);
+  opts.headers['Content-Type'] = 'application/json';
+  if(authToken) opts.headers['Authorization'] = 'Bearer '+authToken;
+  let res;
+  try{ res = await fetch(path, opts); }
+  catch(e){ throw {status:0, message:'无法连接服务器'}; }
+  if(res.status===401){
+    askToken();
+    throw {status:401, message:'需要口令'};
+  }
+  if(!res.ok){
+    let detail='请求失败';
+    try{ detail=(await res.json()).detail||detail; }catch(e){}
+    throw {status:res.status, message:detail};
+  }
+  if(res.status===204) return null;
+  return res.json();
+}
+function askToken(){
+  const t = prompt('请输入管理口令（加减分/导入等操作需要）：');
+  if(t){ authToken=t.trim(); sessionStorage.setItem('admin_token',authToken); }
+}
+
+/* ---------- 保存到后端（当前班级整表，防抖） ---------- */
+let saveTimer=null;
+function save(){
+  const cls = currentClass();
+  if(!cls) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async()=>{
+    try{ await api(`/classroom/api/classes/${cls.id}/state`,{method:'PUT',body:JSON.stringify({state:state})}); }
+    catch(e){ if(e.status!==401) toast('⚠ 保存失败：'+e.message); }
+  },250);
+}
+async function saveNow(){
+  const cls=currentClass(); if(!cls) return;
+  clearTimeout(saveTimer);
+  await api(`/classroom/api/classes/${cls.id}/state`,{method:'PUT',body:JSON.stringify({state:state})});
+}
+
+/* ---------- 启动加载 ---------- */
+async function load(){
+  const data = await api('/classroom/api/classes');
+  root.classes = data.classes||[];
+  root.currentClassId = data.currentClassId;
+  if(root.classes.length){
+    if(!root.classes.some(c=>c.id===root.currentClassId)) root.currentClassId=root.classes[0].id;
+    switchToClass(root.currentClassId,true);
+  }
+}
+
+/* ---------- 班级管理 ---------- */
+function currentClass(){
+  return root.classes.find(c=>c.id===root.currentClassId)||null;
+}
+function switchToClass(id,silent){
+  const c=root.classes.find(x=>x.id===id);
+  if(!c) return;
+  root.currentClassId=id; state=c.state;
+  seq=state.students.reduce((m,s)=>Math.max(m,(s.id||0)+1),1);
+  if(!silent){
+    api('/classroom/api/meta/current',{method:'PUT',body:JSON.stringify({currentClassId:id})}).catch(()=>{});
+    syncUI(); render(); toast(`已切换到「${c.name}」`);
+  }
+}
+async function addClass(name){
+  name=(name||'').trim();
+  if(!name){ toast('请输入班级名称'); return; }
+  try{
+    const r = await api('/classroom/api/classes/create',{method:'POST',body:JSON.stringify({name,state:newClassState()})});
+    root.classes.push({id:r.id,name:r.name,state:r.state});
+    root.currentClassId=r.id; state=r.state; seq=1;
+    syncUI(); render();
+    toast(`✅ 已新建并切换到「${name}」`);
+  }catch(e){ if(e.status!==401) toast('⚠ '+e.message); }
+}
+async function renameClass(id,name){
+  name=(name||'').trim(); if(!name) return;
+  try{
+    await api(`/classroom/api/classes/${id}/rename`,{method:'PUT',body:JSON.stringify({name})});
+    const c=root.classes.find(x=>x.id===id); c.name=name;
+    syncUI(); toast('✅ 班级已重命名');
+  }catch(e){ if(e.status!==401) toast('⚠ '+e.message); }
+}
+async function deleteClass(id){
+  const c=root.classes.find(x=>x.id===id); if(!c) return;
+  if(!confirm(`确定删除班级「${c.name}」及其全部 ${c.state.students.length} 名学生数据？建议先备份。`)) return;
+  try{
+    await api(`/classroom/api/classes/${id}/delete`,{method:'DELETE'});
+    root.classes=root.classes.filter(x=>x.id!==id);
+    if(root.currentClassId===id){
+      root.currentClassId=root.classes.length?root.classes[0].id:null;
+      if(root.currentClassId) switchToClass(root.currentClassId,true);
+      else { state=newClassState(); seq=1; }
+    }
+    syncUI(); render(); toast('班级已删除');
+  }catch(e){ if(e.status!==401) toast('⚠ '+e.message); }
+}
+
+
+/* ================= 头衔规则 ================= */
+const TITLE_PRESETS = [
+  {key:'人工智能', names:['AI大模型','算法大师','智能新锐']},
+  {key:'智能科学', names:['AI大模型','算法大师','智能新锐']},
+  {key:'AI', names:['AI大模型','算法大师','智能新锐']},
+  {key:'网络', names:['网络天才','网络精英','网络新锐']},
+  {key:'新媒体', names:['新媒体人才','新媒体精英','新媒体新锐']},
+  {key:'融媒', names:['融媒体优才','融媒体精英','融媒体新锐']},
+  {key:'软件', names:['软件大师','软件精英','软件新锐']},
+  {key:'大数据', names:['大数据英才','数据精英','数据新锐']},
+  {key:'计算机', names:['计算机英才','技术精英','技术新锐']}
+];
+const DEFAULT_TITLES = ['积分状元','积分榜眼','积分探花'];
+function getTitles(){
+  const t = [state.titles[1], state.titles[2], state.titles[3]];
+  if(t.some(x=>x && x.trim())) return t.map(x=>(x||'').trim());
+  // 未自定义时，根据专业名智能匹配
+  const m = (state.major||'').trim();
+  if(m){
+    const hit = TITLE_PRESETS.find(p=>m.includes(p.key)||p.key.includes(m.slice(0,2)));
+    if(hit) return hit.names;
+    // 通用规则：专业名 + 后缀
+    return [m+'英才', m+'精英', m+'新锐'];
+  }
+  return DEFAULT_TITLES;
+}
+
+/* ================= 排序 ================= */
+function ranked(){
+  return [...state.students].sort((a,b)=> b.score-a.score || a.id-b.id);
+}
+// 标准竞赛排名（1,2,2,4）
+function rankOf(list){
+  const map = new Map();
+  let lastScore = null, lastRank = 0;
+  list.forEach((s,i)=>{
+    if(s.score !== lastScore){ lastRank = i+1; lastScore = s.score; }
+    map.set(s.id, lastRank);
+  });
+  return map;
+}
+
+/* ================= 积分操作（含撤销栈） ================= */
+function adjust(id, delta, flyFrom){
+  const st = state.students.find(x=>x.id===id);
+  if(!st) return;
+  st.score += delta;
+  state.history.push({id, delta});
+  if(state.history.length>300) state.history.shift();
+  save(); render();
+  showFly(delta, flyFrom);
+  const titles = getTitles();
+  toast(`${st.name}  ${delta>0?'+'+delta:delta} 分（当前 ${st.score}）`);
+}
+function undo(){
+  const last = state.history.pop();
+  if(!last){ toast('没有可撤销的操作'); return; }
+  const st = state.students.find(x=>x.id===last.id);
+  if(st) st.score -= last.delta;
+  save(); render();
+  toast(st ? `已撤销 ${st.name} 的 ${last.delta>0?'+':''}${last.delta} 分` : '已撤销上一步');
+}
+
+function currentAmount(){
+  let v = parseInt(document.getElementById('amountInput').value,10);
+  if(isNaN(v) || v<1) v = 1;
+  return v;
+}
+function adjustPicked(dir){
+  if(state.pickedId==null) return;
+  adjust(state.pickedId, dir*currentAmount(), document.getElementById('addBtn'));
+}
+function searchAdjust(dir){
+  if(state.pickedId==null) return;
+  const amt = parseInt(document.getElementById('spAmount').value,10)||1;
+  adjust(state.pickedId, dir*amt, document.getElementById('searchInput'));
+}
+
+/* ================= 随机滚动 ================= */
+let rolling = false, timer = null;
+const rollNameEl = document.getElementById('rollName');
+
+function toggleRoll(){
+  if(state.students.length===0){ toast('请先导入学生名单'); return; }
+  rolling = !rolling;
+  const btn = document.getElementById('startBtn');
+  if(rolling){
+    btn.textContent = '停止！';
+    btn.classList.remove('btn-gold'); btn.classList.add('btn-red');
+    rollNameEl.classList.add('rolling'); rollNameEl.classList.remove('pop');
+    document.getElementById('addBtn').disabled = true;
+    document.getElementById('subBtn').disabled = true;
+    tick();
+  }else{
+    clearTimeout(timer);
+    rolling = false;
+    btn.textContent = '开始滚动';
+    btn.classList.add('btn-gold'); btn.classList.remove('btn-red');
+    rollNameEl.classList.remove('rolling');
+    // 公平随机锁定
+    const pick = state.students[Math.floor(Math.random()*state.students.length)];
+    state.pickedId = pick.id;
+    rollNameEl.textContent = pick.name;
+    rollNameEl.classList.add('pop');
+    document.getElementById('addBtn').disabled = false;
+    document.getElementById('subBtn').disabled = false;
+    refreshRollInfo();
+    save();
+  }
+}
+function tick(){
+  if(!rolling) return;
+  const p = state.students[Math.floor(Math.random()*state.students.length)];
+  rollNameEl.textContent = p.name;
+  const speed = parseInt(document.getElementById('speedSlider').value,10);
+  timer = setTimeout(tick, speed);
+}
+function refreshRollInfo(){
+  const list = ranked(), rmap = rankOf(list), titles = getTitles();
+  const st = state.students.find(x=>x.id===state.pickedId);
+  const info = document.getElementById('rollInfo');
+  if(!st){ info.innerHTML=''; return; }
+  const rk = rmap.get(st.id);
+  const ttl = rk<=3 ? ` · <b>${titles[rk-1]}</b>` : '';
+  info.innerHTML = `${st.name} 当前第 <b>${rk}</b> 名 · 总分 <b>${st.score}</b>${ttl}`;
+}
+
+/* ================= 渲染排行榜 ================= */
+function crownSVG(){
+  return '<svg width="32" height="32" viewBox="0 0 24 24"><path d="M3 8l4.2 3.6L12 5l4.8 6.6L21 8l-1.8 11.5H4.8L3 8z" fill="#e8c877" stroke="#8a6a20" stroke-width=".8" stroke-linejoin="round"/><rect x="4.8" y="19.5" width="14.4" height="2" rx="1" fill="#c69a3e"/></svg>';
+}
+function medalSVG(rank){
+  const c = rank===2 ? ['#cdd3dc','#7d848f'] : ['#d39a5e','#8f5f2e']; // 2银 3铜
+  return `<svg width="30" height="30" viewBox="0 0 32 32">
+    <circle cx="16" cy="5.2" r="2.4" fill="none" stroke="${c[0]}" stroke-width="2"/>
+    <circle cx="16" cy="17" r="10.5" fill="${c[0]}" stroke="${c[1]}" stroke-width="1.4"/>
+    <circle cx="16" cy="17" r="7.6" fill="none" stroke="${c[1]}" stroke-width=".9" opacity=".7"/>
+    <path d="M16 12.6l1.35 2.8 3.05.42-2.22 2.12.55 3.04L16 19.5l-2.73 1.48.55-3.04-2.22-2.12 3.05-.42z" fill="#fff8e6" opacity=".9"/>
+  </svg>`;
+}
+function render(){
+  const list = ranked();
+  const rmap = rankOf(list);
+  const titles = getTitles();
+
+  // 领奖台（列顺序：2 / 1 / 3）
+  const podium = document.getElementById('podium');
+  podium.innerHTML = '';
+  const order = [1,0,2]; // 名次索引 -> list下标
+  order.forEach(idx=>{
+    const st = list[idx];
+    const rankNo = idx+1;
+    const card = document.createElement('div');
+    card.className = 'podium-card' + (rankNo===1?' first':'') + (st?'':' blank');
+    if(st){
+      const icon = rankNo===1 ? crownSVG() : medalSVG(rankNo);
+      card.innerHTML = `
+        <div class="crown">${icon}</div>
+        <div class="p-rank">NO.${rankNo}</div>
+        <div class="p-name">${esc(st.name)}</div>
+        <div class="p-title">${esc(titles[idx])}</div>
+        <div class="p-score">${st.score}</div>
+        <div class="mini-btns">
+          <button class="mb-sub" onclick="adjust(${st.id},-currentAmount(),this)">－${currentAmount()}</button>
+          <button class="mb-add" onclick="adjust(${st.id},currentAmount(),this)">＋${currentAmount()}</button>
+        </div>`;
+    }else{
+      card.innerHTML = `<div class="crown"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a8822f" stroke-width="1.6"><circle cx="12" cy="9" r="6"/><path d="M9 14l-1.5 7L12 19l4.5 2L15 14"/></svg></div><div class="p-name">虚位以待</div>`;
+    }
+    podium.appendChild(card);
+  });
+
+  // 列表：领奖台展示排序前3名（按位置），其余学生全部列出
+  const rl = document.getElementById('rankList');
+  rl.innerHTML = '';
+  if(list.length===0){
+    rl.innerHTML = '<div class="empty-tip">📋 名单为空<br>请点击右上角「导入名单」上传Excel<br>或点击「试用演示数据」体验效果</div>';
+  }else{
+    list.forEach((st,i)=>{
+      if(i<3) return;   // 前3个位置已在领奖台展示
+      const rk = rmap.get(st.id);
+      const row = document.createElement('div');
+      row.className = 'rank-row';
+      row.innerHTML = `
+        <div class="r-no">${rk}</div>
+        <div><span class="r-name">${esc(st.name)}</span>${st.no?`<span class="r-title">学号 ${esc(st.no)}</span>`:''}</div>
+        <div class="mini-btns">
+          <button class="mb-sub" onclick="adjust(${st.id},-currentAmount(),this)">－</button>
+          <button class="mb-add" onclick="adjust(${st.id},currentAmount(),this)">＋</button>
+        </div>
+        <div class="r-score">${st.score}</div>`;
+      rl.appendChild(row);
+    });
+  }
+
+  document.getElementById('countInfo').textContent = list.length? `共 ${list.length} 人` : '';
+  document.getElementById('undoBtn').disabled = state.history.length===0;
+  refreshRollInfo();
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* 浮动 ±分 */
+function showFly(delta, fromEl){
+  if(!fromEl) return;
+  const r = fromEl.getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'delta-fly';
+  el.style.left = (r.left + r.width/2 - 14)+'px';
+  el.style.top = (r.top-6)+'px';
+  el.style.color = delta>0 ? 'var(--gold2)' : 'var(--red)';
+  el.textContent = (delta>0?'+':'')+delta;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+/* ================= Excel 导入 ================= */
+document.getElementById('fileInput').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  if(typeof XLSX === 'undefined'){ toast('Excel库未加载，请联网后刷新，或使用备份恢复'); e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    try{
+      const wb = XLSX.read(new Uint8Array(ev.target.result), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {defval:''});
+      if(!rows.length){ toast('表格中没有数据'); return; }
+      const keys = Object.keys(rows[0]);
+      const nameKey = pickKey(keys, ['姓名','名字','学生','学生姓名','名称','name','Name']);
+      const noKey   = pickKey(keys, ['学号','学籍号','编号','id','ID','no']);
+      if(nameKey==null){ toast('未找到“姓名”列，请检查表头'); return; }
+      const names = rows.map(r=>String(r[nameKey]).trim()).filter(Boolean);
+      if(!names.length){ toast('未读到有效姓名'); return; }
+      const mode = state.students.length
+        ? confirm(`读到 ${names.length} 名学生。\n确定 = 覆盖现有名单；取消 = 追加到现有名单。`) ? 'replace':'append'
+        : 'replace';
+      if(mode==='replace') state.students = [];
+      const exist = new Set(state.students.map(s=>s.name));
+      names.forEach((n,i)=>{
+        if(exist.has(n)) return;
+        exist.add(n);
+        state.students.push({
+          id: seq++, name:n,
+          no: noKey!=null ? String(rows[i][noKey]).trim() : '',
+          score: state.initScore||0
+        });
+      });
+      state.pickedId = null;
+      save(); render();
+      toast(`✅ 导入成功，当前共 ${state.students.length} 人`);
+    }catch(err){
+      console.error(err); toast('解析失败：请确认是标准 .xlsx/.xls 文件');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value='';
+});
+function pickKey(keys, candidates){
+  for(const c of candidates){ const hit = keys.find(k=>String(k).trim().toLowerCase()===c.toLowerCase()); if(hit) return hit; }
+  for(const c of candidates){ const hit = keys.find(k=>String(k).includes(c)); if(hit) return hit; }
+  return null;
+}
+
+/* ================= 导出 ================= */
+function exportExcel(){
+  if(!state.students.length){ toast('暂无数据可导出'); return; }
+  if(typeof XLSX==='undefined'){ toast('Excel库未加载，请联网后重试'); return; }
+  const list = ranked(), rmap = rankOf(list), titles = getTitles();
+  const aoa = [['名次','姓名','学号','积分','头衔']];
+  list.forEach(st=>{
+    const rk = rmap.get(st.id);
+    aoa.push([rk, st.name, st.no||'', st.score, rk<=3?titles[rk-1]:'']);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:8},{wch:14},{wch:18},{wch:8},{wch:18}];
+  // 前三名金色高亮
+  for(let i=0;i<Math.min(3,list.length);i++){
+    const row = i+2;
+    ['A','B','C','D','E'].forEach(c=>{
+      const cell = ws[c+row];
+      if(cell){ cell.s = { fill:{fgColor:{rgb:'FFF3D27A'}}, font:{bold:true} }; }
+    });
+  }
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '积分排名');
+  const cname = safeFile((currentClass()?.name)||'');
+  const name = `课堂积分排名_${cname}_${today()}.xlsx`;
+  XLSX.writeFile(wb, name);
+  toast('✅ 已导出 '+name);
+}
+function safeFile(s){ return String(s).replace(/[\\/:*?"<>|\s]+/g,''); }
+
+function exportJSON(){
+  if(!state.students.length){ toast('当前班级暂无数据可备份'); return; }
+  const payload = { backupType:'singleClass', className: currentClass()?.name||'', state: state };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `课堂积分备份_${safeFile(currentClass()?.name||'班级')}_${today()}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('✅ 已生成当前班级备份文件');
+}
+
+/* 全部班级备份 */
+function exportAllJSON(){
+  if(!root.classes.length){ toast('暂无班级数据'); return; }
+  const payload = { backupType:'allClasses', currentClassId: root.currentClassId, classes: root.classes };
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `课堂积分全部班级备份_${today()}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('✅ 已导出全部 '+root.classes.length+' 个班级的备份');
+}
+document.getElementById('allBackupInput').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.backupType!=='allClasses' || !Array.isArray(data.classes)) throw new Error('格式不正确');
+      if(root.classes.length && !confirm('恢复全部班级备份将覆盖服务器上所有班级数据，确定继续？')) return;
+      restoring = true;
+      await api('/classroom/api/replace-all',{method:'POST',body:JSON.stringify(data)});
+      root = { currentClassId:data.currentClassId, classes:data.classes };
+      if(!root.classes.some(c=>c.id===root.currentClassId)) root.currentClassId=root.classes[0]?.id||null;
+      if(root.currentClassId) switchToClass(root.currentClassId,true);
+      else { state=newClassState(); seq=1; }
+      document.getElementById('mainTitle').textContent=state.title;
+      applyTitleToUI(); syncUI(); render();
+      setTimeout(()=>{restoring=false;},100);
+      toast(`✅ 已恢复全部 ${root.classes.length} 个班级`);
+    }catch(err){ if(err.status!==401) toast('恢复失败：不是有效的全部班级备份文件'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+
+document.getElementById('backupInput').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      let incoming=null, incomingName='';
+      if(data.backupType==='singleClass' && data.state && Array.isArray(data.state.students)){
+        incoming=data.state; incomingName=data.className||'';
+      }else if(data.backupType==='allClasses' && Array.isArray(data.classes)){
+        if(root.classes.length && !confirm('该文件是全部班级备份，将覆盖服务器上所有班级数据，确定？')) return;
+        restoring=true;
+        await api('/classroom/api/replace-all',{method:'POST',body:JSON.stringify(data)});
+        root={currentClassId:data.currentClassId,classes:data.classes};
+        if(!root.classes.some(c=>c.id===root.currentClassId)) root.currentClassId=root.classes[0]?.id||null;
+        if(root.currentClassId) switchToClass(root.currentClassId,true);
+        else { state=newClassState(); seq=1; }
+        document.getElementById('mainTitle').textContent=state.title;
+        applyTitleToUI(); syncUI(); render();
+        setTimeout(()=>{restoring=false;},100);
+        toast(`✅ 已恢复全部 ${root.classes.length} 个班级`);
+        return;
+      }else if(Array.isArray(data.students)){
+        incoming=data; incomingName='';
+      }
+      if(!incoming) throw new Error('无法识别的备份格式');
+
+      // 单班恢复：写入当前班级；若无班级则新建
+      const cls=currentClass();
+      if(cls && state.students.length && !confirm(`将把备份恢复到当前班级「${cls.name}」并覆盖其数据，确定？`)) return;
+      restoring=true;
+      const merged=Object.assign(newClassState(),incoming);
+      let target=cls;
+      if(!target){
+        const r=await api('/classroom/api/classes/create',{method:'POST',body:JSON.stringify({name:incomingName||'默认班级',state:merged})});
+        root.classes.push({id:r.id,name:r.name,state:r.state});
+        root.currentClassId=r.id; target=root.classes[root.classes.length-1];
+      }else{
+        target.state=merged;
+        await api(`/classroom/api/classes/${target.id}/state`,{method:'PUT',body:JSON.stringify({state:merged})});
+      }
+      state=target.state;
+      seq=state.students.reduce((m,s)=>Math.max(m,(s.id||0)+1),1);
+      document.getElementById('mainTitle').textContent=state.title;
+      applyTitleToUI(); syncUI(); render();
+      setTimeout(()=>{restoring=false;},100);
+      toast('✅ 当前班级备份已恢复');
+    }catch(err){ if(err.status!==401) toast('恢复失败：不是有效的备份文件'); }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+});
+function today(){
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+}
+
+/* ================= 搜索 ================= */
+const searchInput = document.getElementById('searchInput');
+const searchPanel = document.getElementById('searchPanel');
+searchInput.addEventListener('input', ()=>{
+  const q = searchInput.value.trim();
+  if(!q){ searchPanel.style.display='none'; return; }
+  const hit = state.students.find(s=>s.name===q)
+           || state.students.find(s=>s.name.includes(q));
+  if(!hit){
+    searchPanel.style.display='block';
+    document.getElementById('spName').textContent = '未找到该学生';
+    document.getElementById('spMeta').textContent = '请检查姓名，或先导入完整名单';
+    state.pickedId = null;
+    return;
+  }
+  state.pickedId = hit.id;
+  const list = ranked(), rmap = rankOf(list), titles = getTitles();
+  const rk = rmap.get(hit.id);
+  document.getElementById('spName').textContent = hit.name;
+  document.getElementById('spMeta').innerHTML =
+    `名次 第 <b style="color:var(--gold2)">${rk}</b> 名 · 积分 <b style="color:var(--gold2)">${hit.score}</b>`
+    + (rk<=3?` · 头衔 <b style="color:var(--gold2)">${titles[rk-1]}</b>`:'')
+    + (hit.no?` · 学号 ${hit.no}`:'');
+  searchPanel.style.display='block';
+  refreshRollInfo();
+});
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-wrap')) searchPanel.style.display='none';
+});
+
+/* ================= 设置 ================= */
+function openSettings(){
+  document.getElementById('setMajor').value = state.major||'';
+  document.getElementById('setT1').value = state.titles[1]||'';
+  document.getElementById('setT2').value = state.titles[2]||'';
+  document.getElementById('setT3').value = state.titles[3]||'';
+  document.getElementById('setInit').value = state.initScore||0;
+  document.getElementById('modalMask').style.display='flex';
+}
+function applyTitleToUI(){
+  document.getElementById('setMajor').value = state.major||'';
+  document.getElementById('setT1').value = state.titles[1]||'';
+  document.getElementById('setT2').value = state.titles[2]||'';
+  document.getElementById('setT3').value = state.titles[3]||'';
+  document.getElementById('setInit').value = state.initScore||0;
+}
+function closeSettings(){ document.getElementById('modalMask').style.display='none'; }
+function saveSettings(){
+  state.major = document.getElementById('setMajor').value.trim();
+  state.titles = {
+    1: document.getElementById('setT1').value.trim(),
+    2: document.getElementById('setT2').value.trim(),
+    3: document.getElementById('setT3').value.trim()
+  };
+  state.initScore = parseInt(document.getElementById('setInit').value,10)||0;
+  save(); render(); closeSettings();
+  toast('✅ 设置已保存');
+}
+document.getElementById('modalMask').addEventListener('click', e=>{
+  if(e.target.id==='modalMask') closeSettings();
+});
+
+/* ================= 标题 / 全屏 / 演示 / 清空 ================= */
+const titleEl = document.getElementById('mainTitle');
+titleEl.addEventListener('blur', ()=>{
+  if(restoring) return;
+  state.title = titleEl.textContent.trim() || '课堂点名 · 积分风云榜';
+  titleEl.textContent = state.title;
+  save();
+});
+titleEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); titleEl.blur(); } });
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+function loadDemo(){
+  if(state.students.length && !confirm('将覆盖当前名单并填充演示积分，确定？')) return;
+  const names = ['张伟','王芳','李娜','刘洋','陈静','杨磊','赵敏','黄强','周杰','吴婷','徐峰','孙丽','马超','朱琳','胡兵','郭涛','林雪','何欢'];
+  state.students = names.map((n,i)=>({id:seq++, name:n, no:'2026'+String(101+i), score:0}));
+  state.major = state.major || '网络技术';
+  state.history = []; state.pickedId = null;
+  // 随机给一些积分形成排行
+  state.students.forEach((s,i)=>{
+    const sc = [18,15,15,12,10,9,7,6,5,4,3,3,2,1,0,0,0,0][i] ?? 0;
+    s.score = sc;
+  });
+  save(); render();
+  toast('✅ 演示数据已载入（专业：网络技术）');
+}
+
+function clearAll(){
+  if(!state.students.length && !state.history.length){ toast('当前没有数据'); return; }
+  if(!confirm('确定清空全部名单、积分与操作历史？此操作不可恢复（建议先备份）。')) return;
+  state.students = []; state.history = []; state.pickedId = null;
+  save(); render();
+  toast('已清空全部数据');
+}
+
+/* ================= 速度滑块 & 快捷分值 ================= */
+const speedSlider = document.getElementById('speedSlider');
+speedSlider.addEventListener('input', ()=>{
+  const v = parseInt(speedSlider.value,10);
+  document.getElementById('speedVal').textContent =
+    (v<=80?'极快':v<=150?'快':v<=230?'中':'慢') + ` · ${v}ms`;
+});
+document.querySelectorAll('.quick-amt').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('amountInput').value = btn.dataset.amt;
+    render();
+  });
+});
+document.getElementById('amountInput').addEventListener('input', ()=>{
+  const v = document.getElementById('amountInput').value;
+  document.querySelectorAll('.quick-amt').forEach(b=>{
+    b.classList.toggle('active', b.dataset.amt===String(parseInt(v,10)));
+  });
+  render();
+});
+
+/* ================= UI 同步（班级选择器等） ================= */
+function syncUI(){
+  const sel = document.getElementById('classSelect');
+  const prev = root.currentClassId;
+  sel.innerHTML = '';
+  if(root.classes.length===0){
+    const o=document.createElement('option');
+    o.textContent='（未创建班级）'; o.value='';
+    sel.appendChild(o);
+  }else{
+    root.classes.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id;
+      o.textContent = `${c.name}（${c.state.students.length}人）`;
+      sel.appendChild(o);
+    });
+    sel.value = prev;
+  }
+  // 标题与设置
+  titleEl.textContent = state.title;
+  applyTitleToUI();
+  // 清空搜索
+  searchInput.value='';
+  document.getElementById('searchPanel').style.display='none';
+  // 若班级管理弹窗开着，刷新列表
+  if(document.getElementById('classModalMask').style.display==='flex') renderClassManagerList();
+}
+
+function openClassManager(){
+  renderClassManagerList();
+  document.getElementById('classModalMask').style.display='flex';
+}
+function closeClassManager(){ document.getElementById('classModalMask').style.display='none'; }
+function renderClassManagerList(){
+  const box = document.getElementById('classManagerList');
+  box.innerHTML='';
+  if(!root.classes.length){ box.innerHTML='<div class="hint">还没有班级，请先在上方新建。</div>'; return; }
+  root.classes.forEach(c=>{
+    const row=document.createElement('div');
+    row.className='class-mgr-row';
+    const isCurrent = c.id===root.currentClassId;
+    row.innerHTML = `
+      <span class="cm-name">${esc(c.name)} ${isCurrent?'<span class="cm-flag">当前</span>':''}</span>
+      <span class="cm-info">${c.state.students.length} 人</span>
+      <button class="btn btn-sm" onclick="renameClass('${c.id}',prompt('修改班级名称：','${esc(c.name).replace(/'/g,"\\'")}'))">改名</button>
+      <button class="btn btn-sm btn-red" onclick="deleteClass('${c.id}')">删除</button>`;
+    box.appendChild(row);
+  });
+}
+document.getElementById('classModalMask').addEventListener('click', e=>{
+  if(e.target.id==='classModalMask') closeClassManager();
+});
+
+/* ================= Toast ================= */
+let toastTimer=null;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ================= 启动 ================= */
+(async function init(){
+  try{
+    await load();
+  }catch(e){
+    if(e.status===401){ /* 已弹口令框，用户取消则停留在空页面 */ }
+    else toast('⚠ 加载失败：'+(e.message||'无法连接服务器'));
+  }
+  syncUI();
+  speedSlider.dispatchEvent(new Event('input'));
+  render();
+})();
+</script>
+</body>
+</html>

@@ -59,8 +59,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'myapp',  # 添加应用
-    'photo',  # 添加相册应用
+    'myapp',  # 主站应用
+    'photo',  # 相册应用
+    'classroom',  # 课堂点名积分（独立 SQLite）
 ]
 
 MIDDLEWARE = [
@@ -102,25 +103,40 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 USE_MONGO = os.getenv('USE_MONGO', 'False').lower() == 'true'
 
+CLASSROOM_DB_PATH = BASE_DIR / 'classroom.sqlite'
+
 if USE_MONGO:
     DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'vanBlog',  # 数据库名
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb://172.17.0.1:27017/vanBlog'  # 连接到Docker主机上的MongoDB
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': 'vanBlog',  # 主站数据库
+            'ENFORCE_SCHEMA': False,
+            'CLIENT': {
+                'host': 'mongodb://172.17.0.1:27017/vanBlog'
+            }
+        },
+        'classroom': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': CLASSROOM_DB_PATH,
         }
     }
-}
 else:
-    # fallback到SQLite或其他本地数据库
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
+        },
+        'classroom': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': CLASSROOM_DB_PATH,
         }
     }
+
+# 课堂点名数据只迁移、读写到独立 SQLite，与主站库完全隔离
+DATABASE_ROUTERS = ['classroom.db_router.ClassroomRouter']
+
+# 课堂点名写操作口令（在 docker-compose.yml 的环境变量中设置）
+CLASSROOM_TOKEN = os.getenv('CLASSROOM_TOKEN', '')
 
 
 
