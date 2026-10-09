@@ -9,9 +9,11 @@ venv/*
 
 # 忽略所有在build目录下的文件
 build/
+notes_content/
 
 # 忽略所有在build目录及其子目录下的文件
 build/*
+notes_content/*
 
 # 忽略所有.o和.h文件
 *.o

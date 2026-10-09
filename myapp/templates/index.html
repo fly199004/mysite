@@ -2,42 +2,22 @@
 
 {% block title %}飞云老师{% endblock %}
 
-{% block right %}
+{% block left %}
 <div class="sidebar-section">
-    <div class="section-box">
-        <h3 class="section-title"><i class="fas fa-link"></i> 常用网站链接</h3>
-        <div class="common-links">
-            <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手">
-                <i class="fas fa-robot"></i> 豆包
-            </a>
-            <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台">
-                <i class="fas fa-book-open"></i> 超星
-            </a>
-            <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台">
-                <i class="fab fa-tiktok"></i> 抖音
-            </a>
-            <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区">
-                <i class="fas fa-brain"></i> AIGC
-            </a>
-            <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具">
-                <i class="fas fa-project-diagram"></i> 迅捷画图
-            </a>
-            <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库">
-                <i class="fas fa-book"></i> 知网
-            </a>
-            <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台">
-                <i class="fab fa-bilibili"></i> 哔哩哔哩
-            </a>
-            <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区">
-                <i class="fas fa-code"></i> CSDN
-            </a>
-            <a href="http://nas.liufeisheng.cn" target="_blank" title="NAS - 网络存储">
-                <i class="fas fa-server"></i> NAS
-            </a>
-        </div>
+  {% for grp in home_sidebar %}
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas {{ grp.icon }}"></i> {{ grp.title }}</h3>
+    <div class="article-list">
+      {% for n in grp.notes %}
+      <p><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a></p>
+      {% empty %}<p style="color:#95a0ad;font-size:12px;">暂无</p>{% endfor %}
+      <p style="margin-top:6px;"><a href="{{ grp.all_url }}" style="color:#4CAF50;font-size:12px;">查看全部 &raquo;</a></p>
     </div>
+  </div>
+  {% endfor %}
 </div>
 {% endblock %}
+
 
 {% block content %}
 <section class="intro">
@@ -53,26 +33,31 @@
         <div class="website-showcase">
             <div class="website-item">
                 <h4><i class="fas fa-project-diagram"></i> <a href="/tools/knowmap/" target="_blank">通用知识图谱生成器</a></h4>
-                <p>粘贴任意学科的大纲（支持 # 标题层级、数字章节、列表符号加缩进），一键生成可拖拽、缩放的交互式知识网络，支持层级/力导向布局和导出 PNG 图片。<strong>不限于内科护理学，适用于所有学科领域</strong>，可用于课程梳理、读书笔记、知识体系搭建。<span class="cr-badge">软著登记号 2026SR0460334</span></p>
+                <p>粘贴任意学科的大纲（支持 # 标题层级、数字章节、列表符号加缩进），一键生成可拖拽、缩放的交互式知识网络，支持层级/力导向布局和导出 PNG 图片，可用于课程梳理、读书笔记、知识体系搭建。<span class="cr-badge">软著登记号 2026SR0460334</span></p>
             </div>
 
             <div class="website-item">
                 <h4><i class="fas fa-qrcode"></i> <a href="/tools/label/" target="_blank">二维码标签生成器</a></h4>
-                <p>离线可用的二维码标签制作工具，自定义文字与二维码内容、尺寸和排版，快速生成并导出标签 PDF，适合物料贴标、资产编号等场景。<span class="limit-badge">未登录可免费使用 5 次，之后需登录</span></p>
+                <p>离线可用的二维码标签制作工具，自定义文字与二维码内容、尺寸和排版，快速生成并导出标签 PDF，适合物料贴标、资产编号等场景。<span class="limit-badge">未登录可免费使用 50 次，之后需登录</span></p>
             </div>
 
             <div class="website-item">
                 <h4><i class="fas fa-scroll"></i> <a href="/tools/prompter/" target="_blank">飞云轩提词器</a></h4>
-                <p>简洁的浏览器提词器，支持滚动速度与字号调节、全屏、镜像翻转、语速停顿标记，手机/电脑均可使用，适合短视频口播与课程录制。<span class="limit-badge">未登录可免费使用 5 次，之后需登录</span></p>
+                <p>简洁的浏览器提词器，支持滚动速度与字号调节、全屏、镜像翻转、语速停顿标记，手机/电脑均可使用，适合短视频口播与课程录制。<span class="limit-badge">未登录可免费使用 50 次，之后需登录</span></p>
             </div>
 
             <div class="website-item">
                 <h4><i class="fas fa-user-check"></i> <a href="https://www.liufeisheng.cn/classroom/" target="_blank">课堂点名积分榜</a></h4>
                 <p>课堂点名积分风云榜 - 支持随机滚动点名、Excel名单上传、课堂积分实时排行、前三名荣誉头衔、学生搜索调分，数据保存在服务器并支持备份恢复，适合课堂大屏使用。</p>
             </div>
+
+            <div class="website-item">
+                <h4><i class="fas fa-chart-bar"></i> <a href="https://www.liufeisheng.cn/datav/" target="_blank">数据可视化工具</a></h4>
+                <p>上传 Excel 或 CSV 文件，快速生成交互式图表和可视化报表，支持柱状图、折线图、饼图、环形图、雷达图等，界面直观、图表类型丰富。</p>
+            </div>
         </div>
 
-        <h3>个人开发的网站与推荐工具</h3>
+        <h3>个人开发的网站系统</h3>
 
         <div class="website-showcase">
             <div class="website-item">
@@ -83,11 +68,6 @@
             <div class="website-item">
                 <h4><i class="fas fa-users"></i> <a href="http://crm.liufeisheng.cn" target="_blank">CRM系统</a></h4>
                 <p>crm.liufeisheng.cn - 自己开发的CRM系统（英文版），用于客户关系管理</p>
-            </div>
-
-            <div class="website-item">
-                <h4><i class="fas fa-chart-bar"></i> <a href="https://www.liufeisheng.cn/datav/" target="_blank">数据可视化工具</a></h4>
-                <p>数据可视化工具 - 上传您的Excel或CSV文件，快速生成交互式图表和可视化报表。支持多种图表类型：柱状图、折线图、饼图、环形图、雷达图等。具有直观的界面、多种图表类型选择，以及友好的数据处理体验。</p>
             </div>
 
             <div class="website-item">
@@ -218,4 +198,10 @@
     </style>
 </section>
 
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  {% include '_common_links.html' %}
+</div>
 {% endblock %}

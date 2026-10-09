@@ -1,7 +1,4 @@
-from django.shortcuts import render
-# urls.py
-from django.urls import path
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import *
 from pymongo import MongoClient
@@ -61,13 +58,22 @@ def post(request, article_id=None):
     return article_view(request, article_id=article_id, template_name='post.html')
 
 def reading(request, article_id=None):
-    return article_view(request, category="reading", article_id=article_id, template_name='reading.html')
+    if article_id:
+        return redirect('notes:legacy', domain_id='reading',
+                        legacy_id=article_id, permanent=True)
+    return redirect('/notes/reading/', permanent=True)
 
 def teach(request, article_id=None):
-    return article_view(request, category="teach", article_id=article_id, template_name='teach.html')
+    if article_id:
+        return redirect('notes:legacy', domain_id='teach',
+                        legacy_id=article_id, permanent=True)
+    return redirect('/notes/teach/', permanent=True)
 
 def tech(request, article_id=None):
-    return article_view(request, category="tech", article_id=article_id, template_name='tech.html')
+    if article_id:
+        return redirect('notes:legacy', domain_id='tech',
+                        legacy_id=article_id, permanent=True)
+    return redirect('/notes/tech/', permanent=True)
 
 
 def dh(request):

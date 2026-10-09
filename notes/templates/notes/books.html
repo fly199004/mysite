@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}书架 · 飞云老师{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-th-large" style="color:#d9b45a;"></i> 笔记书架</h2>
+<hr>
+<div class="note-book-grid">
+  {% for card in cards %}
+  <a class="note-book-card" href="{% url 'notes:book_detail' card.book.id %}">
+    <div class="nbc-title">{{ card.book.title }}</div>
+    <div class="nbc-en">{{ card.book.title_en }}</div>
+    <div class="nbc-meta">
+      <span><i class="fas fa-user-edit"></i> {{ card.book.author }}</span>
+      <span><i class="fas fa-file-alt"></i> {{ card.count }} 篇</span>
+    </div>
+  </a>
+  {% empty %}
+  <p>暂无已发布书籍。</p>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block left %}{% endblock %}
+{% block right %}{% endblock %}
+{% block script %}{{ block.super }}
+<style>
+  .note-book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:10px;}
+  .note-book-card{display:block;padding:20px;border:1px solid rgba(217,180,90,.25);border-radius:12px;
+    background:linear-gradient(160deg,#171d2b,#121724);transition:.2s;text-decoration:none;color:#e6ebf5;}
+  .note-book-card:hover{transform:translateY(-3px);border-color:rgba(217,180,90,.6);box-shadow:0 12px 28px rgba(0,0,0,.4);}
+  .nbc-title{font-size:19px;font-weight:700;color:#f0d78c;}
+  .nbc-en{font-size:12px;color:#8a93a6;margin:4px 0 12px;min-height:16px;}
+  .nbc-meta{display:flex;justify-content:space-between;font-size:13px;color:#aeb7c9;}
+</style>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}{{ section.title }} · 飞云老师{% endblock %}
+
+{% block content %}
+<h2 style="color:#4CAF50;"><i class="fas fa-{{ section.icon }}"></i> {{ section.title }}</h2>
+<div style="color:#8a93a6;font-size:13px;">{{ section.title_en }}{% if section.subtitle %} · {{ section.subtitle }}{% endif %}</div>
+{% if section.intro %}<p style="color:#5b616b;margin-top:10px;">{{ section.intro }}</p>{% endif %}
+<hr>
+
+{% if section.id == 'xuan' %}
+  <h3 class="sc-group"><i class="fas fa-book"></i> 阅读记录 <span class="sc-cn">({{ reading|length }})</span></h3>
+  <ol class="sc-list">
+    {% for n in reading %}
+    <li><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a><span class="sc-date">{{ n.date }}</span></li>
+    {% empty %}<p>暂无内容。</p>{% endfor %}
+  </ol>
+
+  {% if book_cards %}
+  <h3 class="sc-group" style="margin-top:30px;"><i class="fas fa-th-large"></i> 书架专题</h3>
+  <div class="sc-grid">
+    {% for c in book_cards %}
+    <a class="sc-card" href="{% url 'notes:book_detail' c.book.id %}">
+      <div class="scc-head">{{ c.book.title }}</div>
+      <div class="scc-en">{{ c.book.title_en }}</div>
+      <div class="scc-foot"><span><i class="fas fa-user-edit"></i> {{ c.book.author }}</span><span>{{ c.count }} 篇</span></div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+{% elif section.id == 'it' %}
+  <h3 class="sc-group"><i class="fas fa-code"></i> IT记录 <span class="sc-cn">({{ tech|length }})</span></h3>
+  <ol class="sc-list">
+    {% for n in tech %}
+    <li><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a><span class="sc-date">{{ n.date }}</span></li>
+    {% empty %}<p>暂无内容。</p>{% endfor %}
+  </ol>
+
+{% elif section.id == 'teach' %}
+  <ol class="sc-list">
+    {% for n in teach %}
+    <li><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a><span class="sc-date">{{ n.date }}</span></li>
+    {% empty %}<p>暂无内容。</p>{% endfor %}
+  </ol>
+{% endif %}
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  {% include '_common_links.html' %}
+</div>
+{% endblock %}
+{% block script %}{{ block.super }}
+<style>
+  .sc-group{color:#34495e;margin:6px 0 12px;font-size:18px;}
+  .sc-cn{color:#a6adb6;font-size:13px;font-weight:400;}
+  .sc-list{list-style:none;padding:0;font-size:16px;}
+  .sc-list li{display:flex;justify-content:space-between;align-items:baseline;
+    padding:10px 4px;border-bottom:1px dashed #e6e9ed;gap:14px;}
+  .sc-list a{color:#43A047;flex:1;}
+  .sc-list a:hover{color:#2E7D32;}
+  .sc-date{color:#a6adb6;font-size:13px;white-space:nowrap;}
+  .sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+  .sc-card{display:block;padding:16px;border:1px solid #e6e9ed;border-radius:12px;
+    background:#fff;box-shadow:0 1px 3px rgba(000,0,0,.05);transition:.18s;text-decoration:none;}
+  .sc-card:hover{transform:translateY(-3px);border-color:#e3cf95;box-shadow:0 10px 22px rgba(0,0,0,.1);}
+  .scc-head{font-size:17px;font-weight:700;color:#2c3e50;}
+  .scc-en{font-size:12px;color:#a6adb6;margin:5px 0 12px;}
+  .scc-foot{display:flex;justify-content:space-between;font-size:12px;color:#7a828c;}
+</style>
+{% endblock %}

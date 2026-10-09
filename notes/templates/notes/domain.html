@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}{{ domain.title }} · 飞云老师{% endblock %}
+
+{% block content %}
+<h2 style="color:#4CAF50;"><i class="fas fa-{{ domain.icon }}"></i> {{ domain.title }}</h2>
+<div style="color:#8a93a6;font-size:13px;">{{ domain.title_en }}</div>
+{% if domain.intro %}<p style="color:#5b616b;margin-top:10px;">{{ domain.intro }}</p>{% endif %}
+<hr>
+<ol class="dm-list">
+  {% for n in notes %}
+  <li>
+    <a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a>
+    <span class="dm-date">{{ n.date }}</span>
+  </li>
+  {% empty %}
+  <p>暂无内容。</p>
+  {% endfor %}
+</ol>
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  {% include '_common_links.html' %}
+</div>
+{% endblock %}
+{% block script %}{{ block.super }}
+<style>
+  .dm-list{list-style:none;padding:0;font-size:16px;}
+  .dm-list li{display:flex;justify-content:space-between;align-items:baseline;
+    padding:11px 4px;border-bottom:1px dashed #e6e9ed;gap:14px;}
+  .dm-list a{color:#43A047;flex:1;}
+  .dm-list a:hover{color:#2E7D32;}
+  .dm-date{color:#a6adb6;font-size:13px;white-space:nowrap;}
+</style>
+{% endblock %}

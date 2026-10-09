@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }} · 飞云老师{% endblock %}
+
+{% block left %}
+<div class="sidebar-section">
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-book"></i> 关于本书</h3>
+    <div class="article-list" style="font-size:13px;line-height:1.8;color:#aeb7c9;">
+      <p><b style="color:#e6ebf5;">作者：</b>{{ book.author }}</p>
+      {% if book.categories %}
+      <p><b style="color:#e6ebf5;">分类：</b><br>
+      {% for c in book.categories %}<span class="nb-chip">{{ c }}</span>{% endfor %}</p>
+      {% endif %}
+      {% if book.tags %}
+      <p>{% for t in book.tags %}<span class="nb-tag">#{{ t }}</span> {% endfor %}</p>
+      {% endif %}
+      <p><a href="{% url 'notes:books' %}"><i class="fas fa-arrow-left"></i> 返回书架</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<h2 style="color:#f0d78c;">{{ book.title }}</h2>
+<div style="color:#8a93a6;font-size:13px;">{{ book.title_en }}</div>
+{% if book.intro %}<p style="color:#c3cad8;margin-top:12px;">{{ book.intro }}</p>{% endif %}
+<hr>
+<h3 style="color:#e6ebf5;"><i class="fas fa-list-ol"></i> 章节笔记（{{ chapters|length }}）</h3>
+<ol class="chapter-list">
+  {% for n in chapters %}
+  <li>
+    <a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a>
+    {% if n.visibility == 'login' %}<i class="fas fa-lock" title="仅登录可见" style="color:#d9b45a;font-size:12px;"></i>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}
+
+{% block right %}{% endblock %}
+{% block script %}{{ block.super }}
+<style>
+  .chapter-list{font-size:16px;line-height:2.3;color:#c3cad8;padding-left:22px;}
+  .chapter-list a{color:#dfe5f0;}
+  .chapter-list a:hover{color:#f0d78c;}
+  .nb-chip{display:inline-block;background:rgba(217,180,90,.12);border:1px solid rgba(217,180,90,.3);
+    border-radius:6px;padding:1px 8px;margin:2px 3px 2px 0;font-size:12px;color:#e8d29a;}
+  .nb-tag{color:#8fa3c8;font-size:13px;}
+</style>
+{% endblock %}

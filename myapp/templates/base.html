@@ -18,6 +18,10 @@
   .nav-dropdown li{margin:0}
   .nav-dropdown a{display:block;padding:8px 12px;border-radius:6px;color:#d6dce8}
   .nav-dropdown a:hover{background:rgba(217,180,90,.15);color:#f0d78c}
+
+  /* 左侧栏文章标题之间用虚线隔开（全站生效） */
+  .left-sidebar .article-list p{border-bottom:1px dashed #d6dce2;padding-bottom:7px;margin-bottom:7px;}
+  .left-sidebar .article-list p:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
 </style>
 </head>
 <body>    
@@ -28,13 +32,13 @@
             </button>
             <ul class="nav-links" id="nav-links">
                 <li><a href="/"><i class="fas fa-home"></i> 首页</a></li>
-                <li><a href="/tech"><i class="fas fa-code"></i> IT记录</a></li>
-                <li><a href="/teach"><i class="fas fa-chalkboard-teacher"></i> IT教学</a></li>
-                <li><a href="/reading"><i class="fas fa-book-reader"></i> 阅读记录</a></li>    
-                <li><a href="/photo"><i class="fas fa-camera"></i> 照片</a></li>         
+                <li><a href="/notes/ai-news/"><i class="fas fa-robot"></i> AI资讯</a></li>
+                <li><a href="/notes/it/"><i class="fas fa-laptop-code"></i> IT技术</a></li>
+                <li><a href="/notes/xuan/"><i class="fas fa-feather-alt"></i> 飞云阅读</a></li>
+                <li><a href="/photo"><i class="fas fa-camera"></i> 照片</a></li>
                 <li><a href="http://blog.liufeisheng.cn"><i class="fas fa-blog"></i> 博客</a></li>
-                <li><a href="/datav"><i class="fas fa-chart-bar"></i>DataViz</a></li>
                 <li><a href="/classroom/"><i class="fas fa-trophy"></i> 点名积分</a></li>
+                <li><a href="/notes/"><i class="fas fa-share-alt"></i> 知识分享</a></li>
                 <li><a href="/me"><i class="fas fa-user"></i> 关于我</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-user">
@@ -59,59 +63,23 @@
         <aside class="sidebar left-sidebar">
             {% block left %}
             <div class="sidebar-section">
+                {% for grp in kb_sidebar %}
                 <div class="section-box">
-                    <h3 class="section-title"><i class="fas fa-newspaper"></i> 最新资讯</h3>
+                    <h3 class="section-title"><i class="fas {{ grp.icon }}"></i> {{ grp.title }}</h3>
                     <div class="article-list">
-                        {% block latest_news %}{% endblock %}
+                        {% if grp.kind == 'books' %}
+                            {% for b in grp.books %}
+                            <p><a href="{% url 'notes:book_detail' b.id %}">{{ b.title }}</a></p>
+                            {% empty %}<p style="color:#95a0ad;font-size:12px;">暂无</p>{% endfor %}
+                        {% else %}
+                            {% for n in grp.notes %}
+                            <p><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a></p>
+                            {% empty %}<p style="color:#95a0ad;font-size:12px;">暂无</p>{% endfor %}
+                        {% endif %}
+                        <p style="margin-top:6px;"><a href="{{ grp.all_url }}" style="color:#4CAF50;font-size:12px;">查看全部 &raquo;</a></p>
                     </div>
                 </div>
-                
-                <div class="section-box">
-                    <h3 class="section-title"><i class="fas fa-clock"></i> 最近文章</h3>
-                    <div class="article-list">
-                        {% block recent_articles %}{% endblock %}
-                    </div>
-                </div>
-                
-                <div class="section-box">
-                    <h3 class="section-title"><i class="fas fa-list"></i> 文章列表</h3>
-                    <div class="article-list">
-                        {% block article_list %}{% endblock %}
-                    </div>
-                </div>
-                
-                <div class="section-box">
-                    <h3 class="section-title"><i class="fas fa-link"></i> 常用网站链接</h3>
-                    <div class="common-links">
-                        <a href="https://www.doubao.com/" target="_blank" title="豆包 - AI智能助手">
-                            <i class="fas fa-robot"></i> 豆包
-                        </a>
-                        <a href="https://www.chaoxing.com/" target="_blank" title="超星 - 在线学习平台">
-                            <i class="fas fa-book-open"></i> 超星
-                        </a>
-                        <a href="https://www.douyin.com/" target="_blank" title="抖音 - 短视频社交平台">
-                            <i class="fab fa-tiktok"></i> 抖音
-                        </a>
-                        <a href="https://www.aigc.cn/" target="_blank" title="AIGC中文社区 - AI生成内容社区">
-                            <i class="fas fa-brain"></i> AIGC
-                        </a>
-                        <a href="https://www.liuchengtu.com/" target="_blank" title="迅捷画图 - 在线流程图工具">
-                            <i class="fas fa-project-diagram"></i> 迅捷画图
-                        </a>
-                        <a href="https://www.cnki.net/" target="_blank" title="中国知网 - 学术文献数据库">
-                            <i class="fas fa-book"></i> 知网
-                        </a>
-                        <a href="https://www.bilibili.com/" target="_blank" title="哔哩哔哩 - 视频分享平台">
-                            <i class="fab fa-bilibili"></i> 哔哩哔哩
-                        </a>
-                        <a href="https://www.csdn.net/" target="_blank" title="CSDN - IT技术社区">
-                            <i class="fas fa-code"></i> CSDN
-                        </a>
-                        <a href="http://nas.liufeisheng.cn" target="_blank" title="NAS - 网络存储">
-                            <i class="fas fa-server"></i> NAS
-                        </a>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
             {% endblock %}
         </aside>
@@ -264,7 +232,7 @@
 
     <footer class="site-footer">
         <div class="footer-content">
-            <p>&copy;2024 刘飞生 <a href="http://beian.miit.gov.cn" style="color: aliceblue;"> 粤ICP备2024204428号</a></p>
+            <p>&copy;2024 飞云老师 <a href="http://beian.miit.gov.cn" style="color: aliceblue;"> 粤ICP备2024204428号</a></p>
         </div>
     </footer>
 </body>

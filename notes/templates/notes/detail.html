@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ note.title }} · 飞云老师{% endblock %}
+
+{% block left %}
+<div class="sidebar-section">
+  {% if book %}
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-book"></i> 所属书籍</h3>
+    <div class="article-list">
+      <p><a href="{% url 'notes:book_detail' book.id %}">{{ book.title }}</a></p>
+      <p style="color:#95a0ad;font-size:12px;">{{ book.author }}</p>
+    </div>
+  </div>
+  {% endif %}
+  {% for grp in kb_sidebar %}
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas {{ grp.icon }}"></i> {{ grp.title }}</h3>
+    <div class="article-list">
+      {% if grp.kind == 'books' %}
+        {% for b in grp.books %}
+        <p><a href="{% url 'notes:book_detail' b.id %}">{{ b.title }}</a></p>
+        {% empty %}<p style="color:#95a0ad;font-size:12px;">暂无</p>{% endfor %}
+      {% else %}
+        {% for n in grp.notes %}
+        <p><a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a></p>
+        {% empty %}<p style="color:#95a0ad;font-size:12px;">暂无</p>{% endfor %}
+      {% endif %}
+      <p style="margin-top:6px;"><a href="{{ grp.all_url }}" style="color:#4CAF50;font-size:12px;">查看全部 &raquo;</a></p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block content %}
+<article class="note-article">
+  <h1 class="note-title">{{ note.title }}</h1>
+  <div class="note-meta">
+    <span><i class="far fa-calendar"></i> 写于 {{ note.date }}</span>
+    {% if book %}<span><i class="fas fa-bookmark"></i> 摘自《{{ book.title }}》</span>{% endif %}
+  </div>
+  <hr>
+  <div class="note-body">{{ html|safe }}</div>
+
+  <nav class="note-pager">
+    {% if prev_n %}
+    <a class="pager-prev" href="{% url 'notes:detail' prev_n.slug %}"><i class="fas fa-chevron-left"></i> {{ prev_n.title }}</a>
+    {% else %}<span></span>{% endif %}
+    {% if next_n %}
+    <a class="pager-next" href="{% url 'notes:detail' next_n.slug %}">{{ next_n.title }} <i class="fas fa-chevron-right"></i></a>
+    {% else %}<span></span>{% endif %}
+  </nav>
+
+  {% if request.user.is_staff %}
+  <div class="note-admin">
+    <a class="btn-edit" href="{% url 'notes:edit' note.slug %}"><i class="fas fa-pen"></i> 在线编辑（仅管理员）</a>
+  </div>
+  {% endif %}
+</article>
+{% endblock %}
+
+{% block right %}
+{% if toc %}
+<h3>本文目录</h3>
+<div class="toc-content">{{ toc|safe }}</div>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  .note-title{color:#4CAF50;margin-bottom:8px;font-size:30px;}
+  .note-meta{color:#95a0ad;font-size:13px;display:flex;gap:20px;flex-wrap:wrap;}
+  .note-body{color:#2b2f36;line-height:1.9;font-size:16.5px;}
+  .note-body h1{color:#4CAF50;margin-top:26px;}
+  .note-body h2{color:#4CAF50;border-left:4px solid #4CAF50;padding-left:10px;margin-top:30px;}
+  .note-body h3{color:#43A047;margin-top:24px;}
+  .note-body h4,.note-body h5,.note-body h6{color:#2E7D32;}
+  .note-body a{color:#2f7bc0;}
+  /* 图片：限制在正文框宽度内，过大自动缩放；点击可看原图 */
+  .note-body img{max-width:100%;height:auto;display:block;margin:16px auto;
+    border-radius:8px;cursor:zoom-in;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+  .note-body table img,.note-body a img{cursor:default;}
+  .note-body table{border-collapse:collapse;width:100%;margin:14px 0;font-size:15px;}
+  .note-body th,.note-body td{border:1px solid #e2e6ea;padding:8px 12px;}
+  .note-body th{background:#f4f6f8;color:#2c3e50;}
+  .note-body tr:nth-child(even){background:#fafbfc;}
+  .note-body pre{background:#0f1420;border:1px solid #232c3e;border-radius:8px;padding:14px;overflow:auto;}
+  .note-body code{background:#f0f2f5;color:#c0341d;border-radius:4px;padding:1px 5px;font-size:14.5px;}
+  .note-body pre code{color:#cdd6e6;background:none;padding:0;}
+  .note-body blockquote{border-left:4px solid #d9b45a;background:#faf6ec;margin:14px 0;padding:8px 16px;color:#5b616b;}
+  .note-pager{display:flex;justify-content:space-between;gap:14px;margin-top:34px;font-size:14px;}
+  .note-pager a{padding:10px 14px;border:1px solid #e2e6ea;border-radius:8px;color:#2c3e50;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05);}
+  .note-pager a:hover{border-color:#d9b45a;color:#b8860b;}
+  .note-admin{margin-top:24px;}
+  .btn-edit{display:inline-block;padding:8px 16px;border-radius:8px;background:#faf6ec;
+    border:1px solid #e3cf95;color:#9a7b1e;font-size:14px;}
+  .btn-edit:hover{background:#f3eccf;}
+
+  /* 右侧本文目录：去项目符号，分级用颜色/字号/粗细区分 */
+  .toc-content{font-size:13.5px;line-height:1.5;}
+  .toc-content > .toc{padding:0;margin:0;}
+  .toc-content ul{list-style:none !important;margin:0;padding:0;}
+  .toc-content li{list-style:none !important;margin:0;padding:0;}
+  .toc-content li::marker{content:none;}
+  .toc-content a{display:block;text-decoration:none;color:#5b616b;
+    border-radius:5px;transition:background .12s,color .12s;}
+  /* 一级：绿色、加粗、稍大 */
+  .toc-content > .toc > ul > li > a{color:#2E7D32;font-weight:700;font-size:14.5px;padding:7px 8px;}
+  /* 二级：常规、中字号 */
+  .toc-content > .toc > ul > li > ul > li > a{color:#3f6f52;font-weight:500;font-size:13.5px;padding:5px 8px 5px 18px;}
+  /* 三级：偏灰、更小、更细 */
+  .toc-content ul ul ul li a{color:#7a828c;font-weight:400;font-size:12.5px;padding:4px 8px 4px 30px;}
+  .toc-content a:hover{background:#eef7ee;color:#1b5e20;}
+
+  /* 左侧栏标题之间用虚线隔开 */
+  .left-sidebar .article-list p{border-bottom:1px dashed #d6dce2;padding-bottom:7px;margin-bottom:7px;}
+  .left-sidebar .article-list p:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0;}
+</style>
+<div id="img-lightbox" style="display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.86);align-items:center;justify-content:center;cursor:zoom-out;padding:4vh 4vw;">
+  <img id="img-lightbox-pic" style="max-width:100%;max-height:100%;border-radius:6px;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);" alt="原图">
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('pre code').forEach(b=>hljs.highlightElement(b));
+  var box=document.getElementById('img-lightbox');
+  var pic=document.getElementById('img-lightbox-pic');
+  document.querySelectorAll('.note-body img').forEach(function(im){
+    im.addEventListener('click',function(){
+      pic.src=im.currentSrc||im.src;
+      box.style.display='flex';
+    });
+  });
+  function close(){box.style.display='none';pic.src='';}
+  box.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+});
+</script>
+{% endblock %}

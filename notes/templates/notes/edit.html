@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}编辑 {{ note.title }} · 飞云老师{% endblock %}
+
+{% block left %}{% endblock %}
+{% block right %}{% endblock %}
+
+{% block content %}
+<h2 style="color:#f0d78c;"><i class="fas fa-pen"></i> 编辑：{{ note.title }}</h2>
+<p style="color:#8a93a6;font-size:13px;">仅修改 NAS 上的发布副本，不影响原始笔记。保存前会自动生成 .bak 备份。</p>
+<form method="post" action="{% url 'notes:save' note.slug %}" id="note-form">
+  {% csrf_token %}
+  <textarea name="content" id="id_content">{{ raw }}</textarea>
+  <div style="margin-top:16px;display:flex;gap:12px;">
+    <button type="submit" class="nb-btn-save"><i class="fas fa-save"></i> 保存</button>
+    <a class="nb-btn-cancel" href="{% url 'notes:detail' note.slug %}">取消 / 返回预览</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block script %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+  new EasyMDE({
+    element: document.getElementById('id_content'),
+    spellChecker: false,
+    autofocus: true,
+    status: ['lines', 'words'],
+    toolbar: ['bold','italic','heading','|','quote','unordered-list','ordered-list',
+      '|','code','link','image','table','horizontal-rule','|','preview','side-by-side','fullscreen']
+  });
+</script>
+<style>
+  .CodeMirror,.CodeMirror-scroll{min-height:60vh;}
+  .nb-btn-save{padding:9px 20px;border-radius:8px;border:none;background:#d9b45a;color:#151a26;font-weight:700;cursor:pointer;}
+  .nb-btn-save:hover{background:#e8c86f;}
+  .nb-btn-cancel{padding:9px 20px;border-radius:8px;border:1px solid #3a445c;color:#cdd6e6;}
+</style>
+{% endblock %}

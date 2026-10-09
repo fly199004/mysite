@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'photo',  # 相册应用
     'classroom',  # 课堂点名积分（独立 SQLite）
     'accounts',  # 全站账号与登录
+    'notes',  # Markdown 笔记知识库（文件系统，不建库）
 ]
 
 MIDDLEWARE = [
@@ -91,6 +92,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+'notes.context_processors.knowledge_sidebar',
+                'notes.context_processors.home_sidebar',
             ],
         },
     },
@@ -107,6 +110,9 @@ USE_MONGO = os.getenv('USE_MONGO', 'False').lower() == 'true'
 
 CLASSROOM_DB_PATH = BASE_DIR / 'classroom.sqlite'
 ACCOUNTS_DB_PATH = BASE_DIR / 'accounts.sqlite'
+
+# Markdown 笔记发布区（文件系统知识库，不建数据库，不 migrate）
+NOTES_ROOT = BASE_DIR / 'notes_content'
 
 # 账号体系（auth / admin / contenttypes / sessions / accounts）统一走
 # 独立的标准 SQLite（accounts），彻底避开 djongo 的兼容问题。
