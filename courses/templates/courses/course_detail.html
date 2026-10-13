@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}{{ course.title }} · 飞云课程{% endblock %}
+
+{% block left %}
+<div class="sidebar-section">
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-graduation-cap"></i> 课程信息</h3>
+    <div class="article-list" style="font-size:13px;line-height:1.9;color:#95a0ad;">
+      <p><b style="color:#5b616b;">分类：</b>{{ track_name }}{% if course.series %} · {{ course.series }}专题{% endif %}</p>
+      {% if course.audience %}<p><b style="color:#5b616b;">适合：</b>{{ course.audience }}</p>{% endif %}
+      {% if course.spec %}<p><b style="color:#5b616b;">规格：</b>{{ course.spec }}</p>
+      {% elif course.episodes %}<p><b style="color:#5b616b;">规格：</b>{{ course.episodes }} 讲{% if course.duration %} · {{ course.duration }}{% endif %}</p>{% endif %}
+      <p><b style="color:#5b616b;">费用：</b>{% if course.free %}免费{% else %}Udemy 付费（价格以平台为准）{% endif %}</p>
+      <p><b style="color:#5b616b;">状态：</b>{{ course.status }}</p>
+      <p><a href="{% url 'courses:course_list' %}#track-{{ course.track }}"><i class="fas fa-arrow-left"></i> 返回飞云课程</a></p>
+    </div>
+  </div>
+
+  {% if course.chapters %}
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-list-ul"></i> 本课大纲</h3>
+    <div class="article-list cd-clist">
+      {% for ch in course.chapters %}
+      <p>
+        <a href="#ch-{{ forloop.counter }}" class="cd-clist-a"><i class="far fa-circle-play"></i> {{ ch.title }}</a>
+        {% if ch.points %}<span class="cd-clist-n" title="{{ ch.points|length }} 个要点">{{ ch.points|length }}</span>{% endif %}
+      </p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="cd-wrap">
+  {% if course.cover %}
+  <img class="cd-cover-img" src="{{ course.cover }}" alt="{{ course.title }}课程封面">
+  {% endif %}
+
+  <h1 class="cd-title">{{ course.title }}</h1>
+  {% if course.headline %}<p class="cd-headline">{{ course.headline }}</p>{% endif %}
+  <div class="cd-tags">
+    <span class="plat-pill {% if course.platform == 'Udemy' %}p-udemy{% elif 'B站' in course.platform and '抖音' not in course.platform %}p-bili{% else %}p-pending{% endif %}">{{ course.platform }}</span>
+    {% for t in course.tags %}<span class="cd-tag">#{{ t }}</span>{% endfor %}
+  </div>
+
+  {# ---- 观看入口（紧随标题/标签） ---- #}
+  <div class="cd-entry">
+    <div class="cd-btns">
+      {% for l in links %}
+        {% if l.url %}
+        <a class="cd-btn cd-btn-{{ l.platform }}"
+           href="{% url 'courses:course_go' course.id %}?to={{ l.platform }}"
+           target="_blank" rel="noopener noreferrer nofollow">
+          <i class="fas fa-arrow-up-right-from-square"></i> 到{{ l.platform }}{% if course.kind == 'long' and l.platform == 'Udemy' %}学习{% else %}观看{% endif %}
+        </a>
+        {% endif %}
+      {% endfor %}
+      {% if not has_link %}
+        <span class="cd-pending"><i class="fas fa-hourglass-half"></i> 各平台链接整理中，即将上线，敬请期待</span>
+      {% endif %}
+    </div>
+    {% if course.kind == 'short' %}
+    <p class="cd-tip">竖屏短视频在手机上观看体验最佳：点击上方按钮可在手机端直接拉起对应 App。</p>
+    {% elif course.platform == 'Udemy' %}
+    <p class="cd-tip">点击后将跳转到 Udemy 平台，课程价格、优惠与结业证书以 Udemy 页面显示为准。</p>
+    {% endif %}
+  </div>
+
+  {% if course.intro %}
+  <h3 class="cd-sec"><i class="fas fa-circle-info"></i> 课程介绍</h3>
+  <p class="cd-intro">{{ course.intro }}</p>
+  {% endif %}
+
+  {% if course.outcomes %}
+  <h3 class="cd-sec"><i class="fas fa-bullseye"></i> 学完你将能够</h3>
+  <ul class="cd-outcomes">
+    {% for o in course.outcomes %}<li>{{ o }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if course.chapters %}
+  <h3 class="cd-sec"><i class="fas fa-list-check"></i> 课程大纲</h3>
+  <div class="cd-outline">
+    {% for ch in course.chapters %}
+    <details class="cd-chapter" id="ch-{{ forloop.counter }}" {% if forloop.counter <= 2 %}open{% endif %}>
+      <summary>
+        <span class="cd-ch-title">{{ ch.title }}</span>
+        {% if ch.points %}<span class="cd-ch-count">{{ ch.points|length }} 个要点</span>{% endif %}
+      </summary>
+      {% if ch.points %}
+      <ul class="cd-ch-points">
+        {% for pt in ch.points %}<li>{{ pt }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+    </details>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# ---- 站内直接观看（B 站可内嵌课程） ---- #}
+  {% if embed_url %}
+  <h3 class="cd-sec"><i class="fas fa-play-circle"></i> 站内直接观看</h3>
+  <div class="cd-frame">
+    <iframe src="{{ embed_url }}" scrolling="no" border="0" frameborder="no"
+            framespacing="0" allowfullscreen="true"
+            referrerpolicy="no-referrer"
+            style="position:absolute;width:100%;height:100%;left:0;top:0;border:0;"></iframe>
+  </div>
+  {% endif %}
+
+  <div class="cd-back"><a href="{% url 'courses:course_list' %}"><i class="fas fa-th-large"></i> 返回飞云课程总览</a></div>
+</div>
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  {% if related %}
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-layer-group"></i> 同分类课程</h3>
+    <div class="article-list cd-related">
+      {% for c in related %}
+      <p><a href="{% url 'courses:course_detail' c.id %}">{{ c.title }}</a></p>
+      {% endfor %}
+      <p style="margin-top:6px;"><a href="{% url 'courses:course_list' %}#track-{{ course.track }}" style="color:#4CAF50;font-size:12px;">查看全部 &raquo;</a></p>
+    </div>
+  </div>
+  {% endif %}
+  {% include 'courses/_teacher_card.html' %}
+</div>
+{% endblock %}
+
+{% block script %}{{ block.super }}
+<style>
+.cd-wrap{max-width:860px;}
+/* 真实课程封面（数据里加 cover 字段即显示；无封面不占位） */
+.cd-cover-img{display:block;width:100%;border-radius:14px;margin-bottom:18px;
+  box-shadow:0 4px 16px rgba(0,0,0,.10);}
+.cd-title{color:#2c3e50;font-size:27px;margin:0 0 8px;line-height:1.35;}
+.cd-headline{font-size:17px;color:#2f8f43;font-weight:600;margin:0 0 12px;line-height:1.6;}
+.cd-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+.cd-tag{font-size:12.5px;color:#8fa3c8;}
+/* 标题区观看入口 */
+.cd-entry{background:#fafbfc;border:1px solid #eef0f3;border-radius:12px;
+  padding:14px 16px;margin-bottom:6px;}
+.cd-intro{color:#3c424d;line-height:1.95;font-size:15.5px;margin:6px 0 20px;}
+.cd-outcomes{list-style:none;padding:0;margin:6px 0 20px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px 18px;}
+.cd-outcomes li{position:relative;padding-left:26px;color:#3c424d;font-size:14.5px;line-height:1.6;}
+.cd-outcomes li::before{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;
+  position:absolute;left:0;top:2px;color:#4CAF50;font-size:13px;}
+.cd-outline{margin:6px 0 20px;border:1px solid #e6e9ee;border-radius:12px;overflow:hidden;}
+.cd-chapter{border-bottom:1px solid #eef0f3;scroll-margin-top:104px;}
+.cd-chapter:last-child{border-bottom:none;}
+.cd-chapter summary{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:13px 16px;cursor:pointer;list-style:none;background:#fafbfc;font-size:15px;
+  color:#2c3e50;font-weight:600;transition:background .12s;}
+.cd-chapter summary::-webkit-details-marker{display:none;}
+.cd-chapter summary:hover{background:#f1f6f1;}
+.cd-chapter[open] summary{background:#eef6ef;border-left:3px solid #4CAF50;padding-left:13px;}
+.cd-ch-title::before{content:"\f07b";font-family:"Font Awesome 6 Free";font-weight:900;
+  color:#9bb7a0;font-size:13px;margin-right:9px;}
+.cd-chapter[open] .cd-ch-title::before{content:"\f07c";color:#4CAF50;}
+.cd-ch-count{font-size:12px;color:#9aa1ad;font-weight:400;}
+.cd-ch-points{list-style:none;padding:10px 16px 14px 40px;margin:0;}
+.cd-ch-points li{position:relative;padding-left:16px;color:#5b616b;font-size:14px;line-height:1.95;}
+.cd-ch-points li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:6px;
+  border-radius:50%;background:#8fc79a;}
+.cd-sec{font-size:16px;color:#2c3e50;margin:22px 0 12px;}
+.plat-pill{display:inline-block;font-size:12px;padding:3px 10px;border-radius:6px;font-weight:600;
+  background:#eef3fb;color:#2f6db0;border:1px solid #d5e2f5;}
+.plat-pill.p-udemy{background:#f3edfb;color:#6a3fb0;border-color:#e2d4f5;}
+.plat-pill.p-bili{background:#fdeef2;color:#d1496f;border-color:#f7d3df;}
+.plat-pill.p-pending{background:#f1f2f4;color:#8a909c;border-color:#e1e4e8;}
+.cd-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;
+  background:#000;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+.cd-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.cd-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;
+  font-size:14.5px;font-weight:600;text-decoration:none;color:#fff;transition:transform .12s,box-shadow .12s;}
+.cd-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.16);color:#fff;}
+.cd-btn-Udemy{background:#a451e0;}
+.cd-btn-B站{background:#fb7299;}
+.cd-btn-抖音{background:#161823;}
+.cd-btn-视频号{background:#07c160;}
+.cd-pending{display:inline-flex;align-items:center;gap:8px;color:#9a8020;background:#fdf6e0;
+  border:1px solid #ecd98f;border-radius:10px;padding:11px 16px;font-size:14px;}
+.cd-tip{color:#9aa1ad;font-size:13px;margin:10px 0 0;line-height:1.7;}
+.cd-back{margin-top:28px;}
+.cd-back a{color:#2f8f43;font-size:14px;text-decoration:none;}
+.cd-back a:hover{text-decoration:underline;}
+/* 左侧课程清单 */
+.cd-clist{font-size:13px;}
+.cd-clist p{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px 0;margin:0;}
+.cd-clist-a{color:#5b616b;text-decoration:none;line-height:1.55;flex:1;min-width:0;}
+.cd-clist-a i{color:#9bb7a0;font-size:11px;margin-right:6px;}
+.cd-clist-a:hover{color:#2f8f43;}
+.cd-clist-a:hover i{color:#4CAF50;}
+.cd-clist-n{flex:none;min-width:20px;text-align:center;font-size:11px;color:#9aa1ad;
+  background:#f1f4f2;border-radius:10px;padding:1px 7px;}
+/* 右栏同分类课程 */
+.cd-related p{padding:6px 0;margin:0;}
+.cd-related a{color:#5b616b;font-size:13.5px;text-decoration:none;line-height:1.6;}
+.cd-related a:hover{color:#2f8f43;}
+@media (max-width:600px){.cd-title{font-size:22px;}.cd-entry{padding:12px;}}
+</style>
+<script>
+(function(){
+  // 点左侧课程清单：确保对应章节展开，再跟随锚点
+  document.querySelectorAll('.cd-clist-a').forEach(function(a){
+    a.addEventListener('click', function(){
+      var d = document.querySelector(a.getAttribute('href'));
+      if (d) d.open = true;
+    });
+  });
+})();
+</script>
+{% endblock %}

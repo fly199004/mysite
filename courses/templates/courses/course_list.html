@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}飞云课程 · 飞云老师{% endblock %}
+
+{% block left %}
+<div class="sidebar-section">
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-graduation-cap"></i> 飞云课程</h3>
+    <div class="article-list" style="font-size:13px;line-height:1.9;">
+      <p style="color:#95a0ad;">{{ stats.long }} 门系统课程 · {{ stats.short }} 个免费短视频系列</p>
+      <p style="color:#95a0ad;">长课累计 {{ stats.episodes }}+ 讲，覆盖编程、算法、数学、AI 与实用技术。</p>
+      {% for t in tracks %}
+      <p><a href="#track-{{ t.id }}"><i class="fas {{ t.icon }}"></i> {{ t.name }}</a></p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}{# ============ 免费短视频（引流，置顶） ============ #}
+<section class="cs-band" id="track-short">
+  <div class="cs-band-head">
+    <h2><i class="fas fa-fire"></i> 短视频课程系列</h2>
+    <span class="cs-band-note">竖屏 · 免费 · 持续更新</span>
+  </div>
+  <div class="cs-grid cs-grid-short">
+    {% for c in shorts %}
+    <a class="ccard ccard-short" href="{% url 'courses:course_detail' c.id %}">
+      <div class="ccard-cover cov-{{ c.id }}">
+        <span class="ccard-free">免费</span>
+        <span class="ccard-cover-icon"><i class="fas fa-mobile-screen-button"></i></span>
+      </div>
+      <div class="ccard-body">
+        <h3>{{ c.title }}</h3>
+        <p>{{ c.summary }}</p>
+        <div class="ccard-meta"><span class="plat-pill">短视频</span></div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{# ============ 主推长课 ============ #}
+{% if featured %}
+<section class="cs-band">
+  <div class="cs-band-head"><h2><i class="fas fa-star"></i> 精选系统课</h2></div>
+  <div class="cs-grid">
+    {% for c in featured %}
+    {% include "courses/_card.html" with c=c %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{# ============ 全部课程，按学科线分组（精选区已展示的长课不再重复） ============ #}
+{% for track, items in groups %}
+{% if track.id != 'short' %}
+<section class="cs-band" id="track-{{ track.id }}">
+  <div class="cs-band-head"><h2><i class="fas {{ track.icon }}"></i> {{ track.name }}</h2></div>
+  <div class="cs-grid">
+    {% for c in items %}
+      {% if not c.featured %}{% include "courses/_card.html" with c=c %}{% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<div class="cs-foot">更多课程正在制作与上架中，欢迎收藏本页或关注各平台「飞云老师」。</div>
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  <div class="cs-head cs-hero cs-hero-side">
+    <div class="cs-hero-badge"><i class="fas fa-user-graduate"></i> 飞云老师 亲自录制 · 持续更新</div>
+    <!-- <h1 class="cs-title">飞云课程</h1> -->
+    <!-- <p class="cs-hero-lead">这里的每一门课，都由飞云老师本人亲自录制、亲自讲解。</p> -->
+    <p class="cs-sub">这套课程覆盖<b>编程开发、算法、大学数学、人工智能</b>等计算机领域，从零基础入门到专业进阶，构成一条完整的学习路线。</p>
+    <div class="cs-hero-path">
+      <span class="cs-step"><i class="fas fa-seedling"></i><b>零基础入门</b><small>C语言 · AI启蒙</small></span>
+      <i class="fas fa-angle-right cs-path-arrow"></i>
+      <span class="cs-step"><i class="fas fa-layer-group"></i><b>专业基础</b><small>数据结构 · 数学</small></span>
+      <i class="fas fa-angle-right cs-path-arrow"></i>
+      <span class="cs-step"><i class="fas fa-rocket"></i><b>进阶实战</b><small>算法 · 网络 · AI</small></span>
+    </div>
+    <p class="cs-hero-note">视频发布在抖音、B 站、Udemy 等平台，本页是全部课程的总入口，点进任意课程即可选择平台观看。</p>
+  </div>
+</div>
+<div class="sidebar-section">
+  {% include "courses/_teacher_card.html" %}
+</div>
+{% endblock %}
+
+{% block script %}{{ block.super }}
+<style>
+.cs-head{margin-bottom:22px;}
+.cs-hero{background:linear-gradient(135deg,#f3faf4,#eef5fb);border:1px solid #dcecdf;
+  border-radius:16px;padding:26px 28px 22px;}
+.cs-hero-badge{display:inline-block;background:#4CAF50;color:#fff;font-size:13px;font-weight:600;
+  padding:5px 14px;border-radius:20px;margin-bottom:14px;}
+.cs-hero-lead{font-size:17px;color:#2c6b3c;font-weight:600;margin:0 0 10px;}
+.cs-hero-path{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 0 12px;}
+.cs-step{display:inline-flex;flex-direction:column;align-items:flex-start;background:#fff;
+  border:1px solid #e0ebe1;border-radius:10px;padding:9px 14px;gap:2px;}
+.cs-step i{color:#4CAF50;font-size:15px;margin-bottom:2px;}
+.cs-step b{font-size:14px;color:#2c3e50;}
+.cs-step small{font-size:12px;color:#8a909c;}
+.cs-path-arrow{color:#b6c8ba;font-size:18px;}
+.cs-hero-note{font-size:13px;color:#95a0ad;margin:6px 0 0;}
+.cs-title{color:#4CAF50;font-size:30px;margin:0 0 8px;}
+.cs-sub{color:#5b616b;line-height:1.8;font-size:15.5px;max-width:760px;}
+/* hero 移到右栏后的窄栏适配 */
+.cs-hero-side{margin-bottom:0;padding:18px 16px;border-radius:12px;}
+.cs-hero-side .cs-hero-badge{font-size:12px;padding:4px 11px;margin-bottom:11px;}
+.cs-hero-side .cs-title{font-size:21px;margin-bottom:6px;}
+.cs-hero-side .cs-hero-lead{font-size:14px;margin-bottom:8px;line-height:1.6;}
+.cs-hero-side .cs-sub{font-size:13px;line-height:1.75;max-width:none;}
+.cs-hero-side .cs-hero-path{flex-direction:column;align-items:stretch;gap:6px;margin:13px 0 10px;}
+.cs-hero-side .cs-step{width:100%;padding:8px 12px;}
+.cs-hero-side .cs-path-arrow{transform:rotate(90deg);text-align:center;}
+.cs-hero-side .cs-hero-note{font-size:12px;line-height:1.7;}
+.cs-band{margin:0 0 30px;scroll-margin-top:80px;}
+.cs-band-head{display:flex;align-items:baseline;gap:12px;margin:0 0 14px;
+  border-left:4px solid #4CAF50;padding-left:10px;}
+.cs-band-head h2{font-size:19px;color:#2c3e50;margin:0;}
+.cs-band-note{font-size:12.5px;color:#e07b39;font-weight:600;}
+.cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;}
+.cs-grid-short{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+
+.ccard{display:flex;flex-direction:column;background:#fff;border:1px solid #e6e9ee;border-radius:12px;
+  overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s,border-color .15s;}
+.ccard:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.10);border-color:#cfe3d2;}
+.ccard-cover{position:relative;height:128px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#3f7d49,#7cc489);}
+.ccard-cover-icon{font-size:40px;color:rgba(255,255,255,.85);}
+.ccard-short .ccard-cover{background:linear-gradient(135deg,#d9763f,#f0a868);}
+/* 每门课一个轻量配色，纯 CSS，无需图片；有封面图后可在数据里加 cover 替换 */
+.cov-data-structure-93{background:linear-gradient(135deg,#2f6db0,#5fa3e0);}
+.cov-algorithm-design-89{background:linear-gradient(135deg,#2f6db0,#69b0e8);}
+.cov-algorithm-interview-10{background:linear-gradient(135deg,#3f6fb0,#7fb2e6);}
+.cov-c-language{background:linear-gradient(135deg,#2b6c8f,#5fa8c9);}
+.cov-calculus-1,.cov-calculus-2,.cov-calculus-3{background:linear-gradient(135deg,#7a4fb0,#a986d6);}
+.cov-linear-algebra{background:linear-gradient(135deg,#6a45ad,#9a78d3);}
+.cov-probability{background:linear-gradient(135deg,#5b46a8,#8e76cf);}
+.cov-discrete-math-1,.cov-discrete-math-2{background:linear-gradient(135deg,#4b5fb5,#8294db);}
+.cov-thesis-writing{background:linear-gradient(135deg,#b08a2f,#d9bd6a);}
+.cov-big-data{background:linear-gradient(135deg,#2f8f86,#67bdb4);}
+.cov-computer-network{background:linear-gradient(135deg,#3a7a78,#74b3ae);}
+.cov-new-energy-diagnosis,.cov-auto-repair{background:linear-gradient(135deg,#4a7a3a,#86bd72);}
+.ccard-free{position:absolute;top:8px;left:8px;background:#ff5a36;color:#fff;font-size:11px;
+  padding:2px 8px;border-radius:20px;font-weight:700;}
+.ccard-body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:7px;flex:1;}
+.ccard-body h3{font-size:15.5px;color:#1f2d3d;margin:0;line-height:1.45;}
+.ccard-body p{font-size:13px;color:#6b7280;line-height:1.6;margin:0;flex:1;}
+.ccard-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.plat-pill{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;font-weight:600;
+  background:#eef3fb;color:#2f6db0;border:1px solid #d5e2f5;}
+.plat-pill.p-udemy{background:#f3edfb;color:#6a3fb0;border-color:#e2d4f5;}
+.plat-pill.p-bili{background:#fdeef2;color:#d1496f;border-color:#f7d3df;}
+.plat-pill.p-free{background:#e9f7ec;color:#2f8f43;border-color:#cfe9d6;}
+.plat-pill.p-pending{background:#f1f2f4;color:#8a909c;border-color:#e1e4e8;}
+.ccard-sub{font-size:11.5px;color:#9aa1ad;}
+.ccard-status{font-size:11px;color:#b08a2f;}
+.cs-foot{margin-top:8px;padding:14px;text-align:center;color:#8a909c;font-size:13.5px;
+  background:#f7f9f7;border-radius:10px;}
+@media (max-width:600px){
+  .cs-grid,.cs-grid-short{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .ccard-cover{height:96px;}.ccard-cover-icon{font-size:30px;}
+  .ccard-body h3{font-size:14px;}.cs-title{font-size:24px;}
+}
+</style>
+{% endblock %}

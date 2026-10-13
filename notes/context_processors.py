@@ -46,14 +46,14 @@ def _build_groups(section):
     groups = []
     if section == 'xuan':
         groups.append({
-            'kind': 'list', 'id': 'reading', 'title': '阅读记录',
-            'icon': 'fa-book', 'all_url': '/notes/reading/',
-            'notes': _latest('reading', 10),
-        })
-        groups.append({
             'kind': 'books', 'id': 'books', 'title': '书架专题',
             'icon': 'fa-th-large', 'all_url': '/notes/books/',
             'books': services.load_manifest().get('books', []),
+        })
+        groups.append({
+            'kind': 'list', 'id': 'reading', 'title': '阅读记录',
+            'icon': 'fa-book', 'all_url': '/notes/reading/',
+            'notes': _latest('reading', 10),
         })
     elif section == 'it':
         groups.append({

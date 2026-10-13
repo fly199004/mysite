@@ -21,16 +21,16 @@
 {% endblock %}
 
 {% block content %}
-<h2 style="color:#f0d78c;">{{ book.title }}</h2>
-<div style="color:#8a93a6;font-size:13px;">{{ book.title_en }}</div>
-{% if book.intro %}<p style="color:#c3cad8;margin-top:12px;">{{ book.intro }}</p>{% endif %}
+<h2 class="book-title">{{ book.title }}</h2>
+<div class="book-sub">{{ book.title_en }}</div>
+{% if book.intro %}<p class="book-intro">{{ book.intro }}</p>{% endif %}
 <hr>
-<h3 style="color:#e6ebf5;"><i class="fas fa-list-ol"></i> 章节笔记（{{ chapters|length }}）</h3>
+<h3 class="book-chapter-title"><i class="fas fa-list-ol"></i> 章节笔记（{{ chapters|length }}）</h3>
 <ol class="chapter-list">
   {% for n in chapters %}
   <li>
     <a href="{% url 'notes:detail' n.slug %}">{{ n.title }}</a>
-    {% if n.visibility == 'login' %}<i class="fas fa-lock" title="仅登录可见" style="color:#d9b45a;font-size:12px;"></i>{% endif %}
+    {% if n.visibility == 'login' %}<i class="fas fa-lock book-lock" title="仅登录可见"></i>{% endif %}
   </li>
   {% endfor %}
 </ol>
@@ -39,9 +39,16 @@
 {% block right %}{% endblock %}
 {% block script %}{{ block.super }}
 <style>
-  .chapter-list{font-size:16px;line-height:2.3;color:#c3cad8;padding-left:22px;}
-  .chapter-list a{color:#dfe5f0;}
-  .chapter-list a:hover{color:#f0d78c;}
+  /* 主内容区：白底深字，与章节内页 detail.html 保持一致 */
+  .book-title{color:#4CAF50;margin-bottom:8px;font-size:30px;}
+  .book-sub{color:#95a0ad;font-size:13px;}
+  .book-intro{color:#5b616b;margin-top:12px;line-height:1.9;font-size:16px;}
+  .book-chapter-title{color:#43A047;margin-top:18px;}
+  .chapter-list{font-size:16px;line-height:2.3;color:#2b2f36;padding-left:22px;margin-top:10px;}
+  .chapter-list a{color:#2f7bc0;}
+  .chapter-list a:hover{color:#1f6bb0;text-decoration:underline;}
+  .book-lock{color:#b8860b;font-size:12px;}
+  /* 左侧「关于本书」框标签：维持原深色侧边栏配色，不改 */
   .nb-chip{display:inline-block;background:rgba(217,180,90,.12);border:1px solid rgba(217,180,90,.3);
     border-radius:6px;padding:1px 8px;margin:2px 3px 2px 0;font-size:12px;color:#e8d29a;}
   .nb-tag{color:#8fa3c8;font-size:13px;}

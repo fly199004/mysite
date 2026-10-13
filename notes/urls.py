@@ -27,6 +27,9 @@ urlpatterns = [
     re_path(r'^(?P<domain_id>' + _DOMAINS + r')/$',
             views.domain_detail, name='domain'),
 
+    # 书架整合：旧 slug 永久跳转（须在 <slug:slug>/ 通配之前）
+    path('old/<str:old_slug>/', views.legacy_slug_redirect, name='legacy_slug'),
+
     path('<slug:slug>/edit/', views.note_edit, name='edit'),
     path('<slug:slug>/save/', views.note_save, name='save'),
     path('<slug:slug>/', views.note_detail, name='detail'),

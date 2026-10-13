@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}知识分享 · 飞云老师{% endblock %}
+
+{% block left %}
+<div class="sidebar-section">
+  <div class="section-box">
+    <h3 class="section-title"><i class="fas fa-share-alt"></i> 知识分享</h3>
+    <div class="article-list" style="font-size:13px;color:#5b616b;line-height:1.8;">
+      <p>共收录 {{ total }} 篇笔记。</p>
+      <p><a href="/notes/xuan/"><i class="fas fa-feather-alt"></i> 飞云阅读 Reading</a></p>
+      <p><a href="/notes/ai-news/"><i class="fas fa-robot"></i> AI资讯 News</a></p>
+      <p><a href="/notes/it/"><i class="fas fa-laptop-code"></i> IT技术 Technology</a></p>
+      <p><a href="/notes/teach/"><i class="fas fa-chalkboard-teacher"></i> IT教学 Teaching</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<h2 style="color:#4CAF50;"><i class="fas fa-share-alt"></i> 知识分享</h2>
+<p style="color:#5b616b;">这里是 Flynn 的知识分享空间。分为飞云阅读（读书笔记与书架专题）、AI资讯（每日 AI 动态）、IT技术（技术实践记录）、IT教学（课程讲义与教学记录）。</p>
+<hr>
+
+<div class="kb-grid">
+  {% for card in cards %}
+  <a class="kb-card" href="{{ card.url }}">
+    <div class="kbc-head"><i class="fas fa-{{ card.icon }}"></i> {{ card.title }}</div>
+    <div class="kbc-en">{{ card.title_en }}{% if card.subtitle %} · {{ card.subtitle }}{% endif %}</div>
+    <div class="kbc-intro">{{ card.intro }}</div>
+    <div class="kbc-foot"><span>{{ card.count }} 篇</span><span class="kbc-date">{{ card.latest }}</span></div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block right %}
+<div class="sidebar-section">
+  {% include '_common_links.html' %}
+</div>
+{% endblock %}
+{% block script %}{{ block.super }}
+<style>
+  .kb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;}
+  .kb-card{display:block;padding:20px;border:1px solid #e6e9ed;border-radius:12px;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:.18s;text-decoration:none;}
+  .kb-card:hover{transform:translateY(-3px);border-color:#e3cf95;box-shadow:0 10px 22px rgba(0,0,0,.1);}
+  .kbc-head{font-size:20px;font-weight:700;color:#2c3e50;}
+  .kbc-en{font-size:12px;color:#a6adb6;margin:6px 0 12px;}
+  .kbc-intro{font-size:13px;color:#5b616b;line-height:1.7;min-height:80px;}
+  .kbc-foot{display:flex;justify-content:space-between;font-size:13px;color:#7a828c;margin-top:12px;}
+  .kbc-date{color:#a6adb6;}
+</style>
+{% endblock %}

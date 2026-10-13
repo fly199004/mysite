@@ -83,6 +83,12 @@ def index(request):
               _latest_date('tech'), '/notes/it/'),
         _card(SECTIONS['teach'], _ind_count('teach'),
               _latest_date('teach'), '/notes/teach/'),
+        # 静态专题页：高性价比人生指南
+        {'title': '高性价比人生指南', 'title_en': 'How to Live Better',
+         'icon': 'compass', 'subtitle': '用最少换回最多',
+         'intro': '一份按性价比排序的人生决策备选单：676 条建议，每条都回答“花掉什么、换回什么”，覆盖健康、金钱、时间精力、法律安全、婚恋育儿等主题。',
+         'count': 0, 'badge': '676 条建议', 'latest': '专题',
+         'url': '/life-guide/'},
     ]
     return render(request, 'notes/index.html', {
         'cards': cards,
@@ -144,7 +150,15 @@ def book_detail(request, book_id):
 
 def note_detail(request, slug):
     note = services.get_note(slug)
-    if not note or not services.can_view(note, request.user):
+    if not note:
+        # 书架整合后旧 URL 永久跳转（旧独立文/旧整合稿已下线）
+        legacy = LEGACY_BOOKSLUG_REDIRECTS.get(slug)
+        if legacy:
+            if legacy.startswith('BOOK:'):
+                return redirect('notes:book_detail', legacy.split(':', 1)[1], permanent=True)
+            return redirect('notes:detail', legacy, permanent=True)
+        raise Http404
+    if not services.can_view(note, request.user):
         raise Http404
     text = services.strip_frontmatter(services.read_note_text(note))
     text = services.strip_leading_h1(text)
@@ -161,6 +175,46 @@ def note_detail(request, slug):
         'note': note, 'html': html, 'toc': toc,
         'prev_n': prev_n, 'next_n': next_n, 'book': b, 'domain': domain,
     })
+
+
+# ---------------- 书架整合：旧 slug 301 ----------------
+# 2026-10-12 书架专题整合：旧独立文/旧整合稿 -> 新书架章节或书架页。
+LEGACY_BOOKSLUG_REDIRECTS = {
+    # 思考，快与慢
+    'p20260414-e7901e': 'tfs-02',
+    'p20260414-05ce39': 'tfs-04',
+    'p20260415-5500eb': 'tfs-06',
+    'p20260425-c7f23a': 'tfs-13',
+    'p20260509-11eec1': 'tfs-18',
+    'p20260519-be806d': 'tfs-25',
+    'p20260521-44b465': 'tfs-27',
+    'p20260522-ebc36e': 'tfs-28',
+    'p20260601-928017': 'tfs-39',
+    # 未来志愿
+    'p20260610-fbc336': 'future-01',
+    'h44870c9a': 'future-02',
+    'he4e48517': 'future-06',
+    'h4996acb0': 'future-10',
+    'h5a5f746e': 'future-11',
+    # 旧影响力 8 篇整合稿（已被 27 篇全量书架取代）-> 影响力书架页
+    'influence-01-autopilot': 'BOOK:influence',
+    'influence-02-reciprocation': 'BOOK:influence',
+    'influence-03-commitment': 'BOOK:influence',
+    'influence-04-social-proof': 'BOOK:influence',
+    'influence-05-liking': 'BOOK:influence',
+    'influence-06-authority': 'BOOK:influence',
+    'influence-07-scarcity': 'BOOK:influence',
+    'influence-epilogue': 'BOOK:influence',
+}
+
+
+def legacy_slug_redirect(request, old_slug):
+    target = LEGACY_BOOKSLUG_REDIRECTS.get(old_slug)
+    if not target:
+        raise Http404
+    if target.startswith('BOOK:'):
+        return redirect('notes:book_detail', target.split(':', 1)[1], permanent=True)
+    return redirect('notes:detail', target, permanent=True)
 
 
 # ---------------- 在线编辑（仅 staff） ----------------

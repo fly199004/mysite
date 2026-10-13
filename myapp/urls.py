@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
+from django.views.static import serve
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -8,7 +10,7 @@ urlpatterns = [
     path('test/',views.test,name='test'),
     path('articles/',views.articles,name='articles'),
     path('articles/<str:article_id>/', views.articles, name='articles'),
-    path('post/',views.post,name='post'),    
+    path('post/',views.post,name='post'),
     path('post/<int:article_id>/', views.post, name='post'),
     path('reading/', views.reading, name='reading'),
     path('reading/<int:article_id>/', views.reading, name='reading'),
@@ -21,6 +23,10 @@ urlpatterns = [
     path('aboutme/', views.me, name='me'),
     path('c/aboutme/', views.me, name='me'),
     path('dh/',views.dh,name='dh'),
+
+    # ---------------- 静态专题页 ----------------
+    # 高性价比人生指南（独立单文件静态页）
+    path('life-guide/', serve, kwargs={'path': 'life-guide.html', 'document_root': settings.BASE_DIR / 'static'}, name='life_guide'),
 
     # ---------------- 在线工具 ----------------
     path('tools/knowmap/', views.tool_knowmap, name='tool_knowmap'),

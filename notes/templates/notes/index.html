@@ -11,6 +11,7 @@
       <p><a href="/notes/ai-news/"><i class="fas fa-robot"></i> AI资讯 News</a></p>
       <p><a href="/notes/it/"><i class="fas fa-laptop-code"></i> IT技术 Technology</a></p>
       <p><a href="/notes/teach/"><i class="fas fa-chalkboard-teacher"></i> IT教学 Teaching</a></p>
+      <p><a href="/life-guide/"><i class="fas fa-compass"></i> 高性价比人生指南</a></p>
     </div>
   </div>
 </div>
@@ -27,7 +28,7 @@
     <div class="kbc-head"><i class="fas fa-{{ card.icon }}"></i> {{ card.title }}</div>
     <div class="kbc-en">{{ card.title_en }}{% if card.subtitle %} · {{ card.subtitle }}{% endif %}</div>
     <div class="kbc-intro">{{ card.intro }}</div>
-    <div class="kbc-foot"><span>{{ card.count }} 篇</span><span class="kbc-date">{{ card.latest }}</span></div>
+    <div class="kbc-foot"><span>{% if card.badge %}{{ card.badge }}{% else %}{{ card.count }} 篇{% endif %}</span><span class="kbc-date">{{ card.latest }}</span></div>
   </a>
   {% endfor %}
 </div>

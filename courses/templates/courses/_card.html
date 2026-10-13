@@ -1,0 +1,22 @@
+{# 单张课程卡片，被 course_list.html 循环 include，变量为 c #}
+<a class="ccard" href="{% url 'courses:course_detail' c.id %}">
+  <div class="ccard-cover cov-{{ c.id }}">
+    {% if c.free %}<span class="ccard-free">免费</span>{% endif %}
+    <span class="ccard-cover-icon"><i class="fas fa-play-circle"></i></span>
+  </div>
+  <div class="ccard-body">
+    <h3>{{ c.title }}</h3>
+    <p>{{ c.summary }}</p>
+    <div class="ccard-meta">
+      {% if c.links %}
+        {% for l in c.links %}
+          <span class="plat-pill {% if l.url %}{% if l.platform == 'Udemy' %}p-udemy{% elif l.platform == 'B站' %}p-bili{% endif %}{% else %}p-pending{% endif %}">{{ l.platform }}</span>
+        {% endfor %}
+      {% else %}
+        <span class="plat-pill p-pending">{{ c.platform }}</span>
+      {% endif %}
+      {% if c.episodes %}<span class="ccard-sub">{{ c.episodes }} 讲{% if c.duration %} · {{ c.duration }}{% endif %}</span>{% endif %}
+    </div>
+    {% if c.status and c.status != '已完结' and c.status != '已上架' %}<div class="ccard-status">{{ c.status }}</div>{% endif %}
+  </div>
+</a>

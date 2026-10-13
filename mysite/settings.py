@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'classroom',  # 课堂点名积分（独立 SQLite）
     'accounts',  # 全站账号与登录
     'notes',  # Markdown 笔记知识库（文件系统，不建库）
+    'courses',  # 飞云课程聚合（文件系统 JSON，不建库）
 ]
 
 MIDDLEWARE = [
