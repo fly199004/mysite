@@ -26,6 +26,7 @@ urlpatterns = [
     path('classroom/', include('classroom.urls')),
     path('notes/', include('notes.urls')),
     path('courses/', include('courses.urls')),
+    path('ai/', include('aichat.urls')),
     path('accounts/', include('accounts.urls')),
 ]
 

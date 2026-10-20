@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'accounts',  # 全站账号与登录
     'notes',  # Markdown 笔记知识库（文件系统，不建库）
     'courses',  # 飞云课程聚合（文件系统 JSON，不建库）
+    'aichat',  # AI 对话子页（Hermes / OpenCode 双后端）
 ]
 
 MIDDLEWARE = [
@@ -223,3 +224,7 @@ OSS_URL = f'https://{OSS_BUCKET_NAME}.{OSS_ENDPOINT}'  # 添加这行
 # 媒体文件配置
 MEDIA_URL = f'{OSS_URL}/'
 MEDIA_ROOT = ''
+
+# ── AI 对话子页（aichat）─────────────────────────────
+AICHAT_CONFIG_PATH = '/app/aichat_config.json'   # 后端地址与密钥（600，勿入库）
+AICHAT_UPLOAD_ROOT = '/app/aichat_uploads'       # 宿主 /volume2/docker/mysite/aichat_uploads
