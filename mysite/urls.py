@@ -34,3 +34,11 @@ urlpatterns = [
 if settings.DEBUG:
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
     urlpatterns += staticfiles_urlpatterns()
+
+# ---- STATIC_FALLBACK_20261026 ----
+# DEBUG=False 时 runserver 不再服务静态文件，这里用 Django 兜底
+from django.views.static import serve as _static_serve
+from django.urls import re_path as _re_path
+urlpatterns += [
+    _re_path(r'^static/(?P<path>.*)$', _static_serve, {'document_root': settings.STATIC_ROOT}),
+]

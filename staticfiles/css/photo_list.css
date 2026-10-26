@@ -1,0 +1,61 @@
+/* 照片列表容器 */
+.photo-list {
+    max-width: 1200px;
+    display: grid;    
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* 自动适应一行照片数量 */
+    gap: 15px;
+    padding: 15px 0;
+}
+
+/* 照片卡片样式 */
+.photo-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #fff;
+    width: 100%;
+    height: 200px;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+/* 照片缩略图样式 */
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* 照片信息覆盖层 */
+.photo-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.photo-card:hover .photo-info {
+    opacity: 1;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+    .photo-list {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* 中等屏幕每行更多卡片 */
+    }
+}
+
+@media (max-width: 768px) {
+    .photo-list {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); /* 中等屏幕每行更多卡片 */
+    }
+} 

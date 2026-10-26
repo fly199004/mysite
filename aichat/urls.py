@@ -1,4 +1,4 @@
-"""AI 对话子页路由。"""
+# -*- coding: utf-8 -*-
 from django.urls import path
 
 from . import views
@@ -6,10 +6,18 @@ from . import views
 app_name = 'aichat'
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('api/models/', views.api_models, name='api_models'),
-    path('api/chat/', views.api_chat, name='api_chat'),
-    path('api/upload/', views.api_upload, name='api_upload'),
-    path('api/files/', views.api_files, name='api_files'),
-    path('api/files/<str:name>/', views.api_download, name='api_download'),
+    path('', views.page, name='page'),
+
+    path('api/bootstrap/', views.bootstrap, name='bootstrap'),
+    path('api/models/', views.models, name='models'),
+
+    path('api/conversations/', views.conversations, name='conversations'),
+    path('api/conversations/<int:cid>/', views.conversation_detail, name='conversation'),
+    path('api/conversations/<int:cid>/messages/', views.conversation_messages, name='messages'),
+    path('api/conversations/<int:cid>/messages/<int:mid>/', views.message_detail, name='message'),
+
+    path('api/chat/', views.chat, name='chat'),
+    path('api/upload/', views.upload, name='upload'),
+    path('api/files/', views.files, name='files'),
+    path('api/files/<str:name>/', views.file_download, name='download'),
 ]

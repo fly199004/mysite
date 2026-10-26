@@ -39,6 +39,13 @@ body {
     z-index: 1000;
 }
 
+/* 锚点跳转（文章目录 TOC、标题链接）留出导航栏高度，否则标题会被吸顶导航盖住
+   2026-10-26：导航实测高度 93px，取 108px 留 15px 呼吸空间。
+   注意：不要再给 .main-content h1~h4 加 scroll-margin-top——两者会叠加（108+108=216px）。 */
+html {
+    scroll-padding-top: 108px;
+}
+
 .nav-container {
     max-width: 1400px;
     margin: 0 auto;
@@ -116,9 +123,11 @@ h2, h3 {
     box-shadow: var(--shadow);
     padding: 1.5rem;
     position: sticky;
-    top: 80px;
+    /* 2026-10-26：原来是 80px，但吸顶导航实测 93px → 侧栏顶部 13px 被导航压住；
+       改成 104px（93 + 11）后侧栏完整露在导航下方 */
+    top: 104px;
     height: fit-content;
-    max-height: calc(100vh - 100px);
+    max-height: calc(100vh - 124px);
     overflow-y: auto;
 }
 
@@ -363,9 +372,26 @@ h2, h3 {
         flex: none;
         margin-bottom: 1rem;
     }
+
+    /* 2026-10-26 修「正文被左边栏遮挡」：
+       变成单列后侧栏是 100% 宽度，若继续 sticky(top:80px) 会悬浮在正文上面
+       （实测 1100px 视口下滚动 700px 时，侧栏 80~658px 区域压住正文，重叠 578px）。
+       单列布局一律回到普通流，不再吸附。 */
+    .left-sidebar,
+    .right-sidebar {
+        position: static;
+        top: auto;
+        max-height: none;
+        overflow: visible;
+    }
 }
 
 @media (max-width: 768px) {
+    /* 手机端导航更矮（logo + 汉堡按钮），锚点余量同步收小 */
+    html {
+        scroll-padding-top: 80px;
+    }
+
     img {
         max-width: 100%;
         height: auto;

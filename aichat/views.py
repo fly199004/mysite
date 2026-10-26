@@ -1,16 +1,15 @@
-"""AI 对话子页（/ai/）：Django 侧做登录校验 + 文件管理 + 流式转发到 Hermes / OpenCode。
+# -*- coding: utf-8 -*-
+"""
+飞云 AI 对话 · 后端
+===================
+- 会话与消息落库（按登录用户隔离），刷新/换设备都能接着聊
+- 两种后端：hermes（容器内 Agent，带工具）/ direct（OpenCode Go 直连，可切模型）
+- SSE 流式转发 + 结束后写库（客户端中断也会保存已生成的部分）
 
-设计说明（重要，改动前先读）：
-- Hermes API Server 的 `model` 参数是**被忽略的**（实测传 totally-fake-model 照样 200），
-  且 capabilities.admin_config_rw=false，所以无法按请求切换 Hermes 的底层模型。
-- 因此本页提供两个后端：
-  A) hermes：带完整工具（可读写上传的文件），模型由容器配置决定（= auto/auto-cn 那套）
-  B) direct：直连 OpenCode Go 的 OpenAI 兼容端点，model 参数真实生效，可切 30+ 模型（无工具）
-- 文件：上传到 /app/aichat_uploads/u<uid>/（宿主 /volume2/docker/mysite/aichat_uploads），
-  同时 bind mount 到 hermes 容器的 /mnt/uploads，agent 用文件工具直接读。
-- 密钥只从 /app/aichat_config.json 读取，不写在代码里。
+环境依赖：Django >= 3.2、requests
 """
 import json
+import mimetypes
 import os
 import re
 import time
@@ -18,237 +17,468 @@ import time
 import requests
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import (FileResponse, Http404, HttpResponse, JsonResponse,
-                         StreamingHttpResponse)
+from django.http import (FileResponse, Http404, HttpResponseBadRequest,
+                         JsonResponse, StreamingHttpResponse)
 from django.shortcuts import render
-from django.views.decorators.http import require_GET, require_POST
+from django.utils import timezone
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-CONFIG_PATH = getattr(settings, "AICHAT_CONFIG_PATH", "/app/aichat_config.json")
-UPLOAD_ROOT = getattr(settings, "AICHAT_UPLOAD_ROOT", "/app/aichat_uploads")
-# agent 看到的上传目录（hermes 容器内的挂载点）
-AGENT_UPLOAD_ROOT = "/mnt/uploads"
+from .models import Conversation, Message
 
-MAX_UPLOAD_BYTES = 50 * 1024 * 1024          # 单文件 50MB
-SAFE_NAME_RE = re.compile(r"^[\w\u4e00-\u9fa5.\-()\[\] ]{1,120}$")
+# ───────────────────────── 配置 ─────────────────────────
+DEFAULT_HERMES_URL = 'http://hermes:8642/v1'
+DEFAULT_DIRECT_URL = 'https://opencode.ai/zen/go/v1'
+DEFAULT_AGENT_MOUNT = '/mnt/uploads'          # hermes 容器里看到的附件目录
+MODEL_CACHE_TTL = 600
+_BLOCKED_MODELS = {'beam-free', 'cat-jam-free', 'step-5-preview-free', 'test'}
+_model_cache = {'at': 0, 'data': []}
 
-# 明确不可用的模型（实测：地区封锁 / 端点无此模型），不给前端选
-BLOCKED_MODELS = {
-    "beam-free",                # 403 RegionError: not available in your country
-    "cat-jam-free",             # 403 RegionError
-    "step-5-preview-free",      # 400 Model is unavailable
-    "test",                     # 占位脏数据
-}
+SYSTEM_PROMPT = (
+    '你是「飞云 AI」，刘飞生老师个人网站里的 AI 助手。'
+    '回答用简体中文，简洁准确；涉及代码请用 Markdown 代码块并标注语言；'
+    '不确定的内容直接说明不确定，不要编造。'
+)
 
 
 def _cfg():
-    with open(CONFIG_PATH, encoding="utf-8") as f:
-        return json.load(f)
+    """读取 /app/aichat_config.json；兼容嵌套与扁平两种写法，缺项回落环境变量/默认值。"""
+    raw = {}
+    path = getattr(settings, 'AICHAT_CONFIG_PATH', '/app/aichat_config.json')
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            raw = json.load(fh)
+    except Exception:
+        raw = {}
+
+    def pick(*keys, **kw):
+        default = kw.get('default', '')
+        for k in keys:
+            cur = raw
+            ok = True
+            for part in k.split('.'):
+                if isinstance(cur, dict) and part in cur:
+                    cur = cur[part]
+                else:
+                    ok = False
+                    break
+            if ok and isinstance(cur, str) and cur.strip():
+                return cur.strip()
+        for k in keys:
+            env = os.environ.get(k.split('.')[-1].upper())
+            if env:
+                return env.strip()
+        return default
+
+    hermes_url = pick('hermes_url', 'hermes.url', 'backends.hermes.url', default=DEFAULT_HERMES_URL).rstrip('/')
+    direct_url = pick('direct_url', 'direct.url', 'backends.direct.url', default=DEFAULT_DIRECT_URL).rstrip('/')
+    return {
+        'hermes': {
+            'url': hermes_url + '/chat/completions',
+            'key': pick('hermes_key', 'hermes.key', 'backends.hermes.key', default=''),
+        },
+        'direct': {
+            'url': direct_url + '/chat/completions',
+            'models_url': direct_url + '/models',
+            'key': pick('direct_key', 'direct.key', 'backends.direct.key',
+                        'opencode_go_api_key', default=os.environ.get('OPENCODE_GO_API_KEY', '')),
+        },
+        'agent_mount': pick('agent_mount', default=DEFAULT_AGENT_MOUNT).rstrip('/'),
+        'upload_root': getattr(settings, 'AICHAT_UPLOAD_ROOT', '/app/aichat_uploads'),
+    }
 
 
 def _user_dir(user):
-    d = os.path.join(UPLOAD_ROOT, "u%d" % user.id)
-    os.makedirs(d, exist_ok=True)
-    return d
+    root = _cfg()['upload_root']
+    path = os.path.join(root, 'u%s' % user.id)
+    os.makedirs(path, exist_ok=True)
+    return path
 
 
-def _safe_name(raw):
-    name = os.path.basename((raw or "").replace("\\", "/")).strip()
-    if not name or not SAFE_NAME_RE.match(name):
-        raise ValueError("文件名含不支持字符（仅允许中英文、数字、空格、. - _ ( ) [ ]，最多 120 字）")
-    return name
+def _agent_path(user, name):
+    return '%s/u%s/%s' % (_cfg()['agent_mount'], user.id, name)
 
 
-# ─────────────────────────── 页面 ───────────────────────────
-@login_required
-def index(request):
-    return render(request, "aichat/index.html", {
-        "user_dir": "u%d" % request.user.id,
-        "max_upload_mb": MAX_UPLOAD_BYTES // (1024 * 1024),
-    })
-
-
-# ─────────────────────────── 模型清单 ───────────────────────────
-_model_cache = {"ts": 0, "direct": []}
-
-
-def _direct_models():
-    """从 OpenCode Go 拉真实模型清单，10 分钟缓存。失败则回退到内置常用清单。"""
-    now = time.time()
-    if _model_cache["direct"] and now - _model_cache["ts"] < 600:
-        return _model_cache["direct"]
-    fallback = ["deepseek-v4.1-flash", "deepseek-v4-pro", "glm-5.3", "glm-5.3-flash",
-                "kimi-k3", "qwen3.8-max", "qwen3.8-flash", "minimax-m3",
-                "grok-4.7", "gpt-6-luna", "claude-haiku-5-5"]
+# ───────────────────────── 工具函数 ─────────────────────────
+def _json_body(request):
     try:
-        cfg = _cfg()
-        r = requests.get(cfg["opencode_url"] + "/models",
-                         headers={"User-Agent": "hermes-aichat/1.0"}, timeout=15)
-        r.raise_for_status()
-        ids = [m.get("id") for m in r.json().get("data", []) if m.get("id")]
-        ids = [i for i in ids if i not in BLOCKED_MODELS]
-        if ids:
-            _model_cache["direct"] = ids
-            _model_cache["ts"] = now
-            return ids
+        return json.loads(request.body.decode('utf-8') or '{}')
     except Exception:
-        pass
-    return fallback
+        return {}
+
+
+def _sse(payload):
+    return 'data: %s\n\n' % json.dumps(payload, ensure_ascii=False)
+
+
+def _short_title(text):
+    text = re.sub(r'\s+', ' ', (text or '')).strip()
+    return text[:24] + ('…' if len(text) > 24 else '') or '新对话'
+
+
+def _group_of(model_id):
+    mid = (model_id or '').lower()
+    table = (
+        (('gpt', 'o1', 'o3', 'o4'), 'OpenAI'),
+        (('claude',), 'Anthropic'),
+        (('gemini',), 'Google'),
+        (('deepseek',), 'DeepSeek'),
+        (('glm', 'chatglm'), '智谱 GLM'),
+        (('kimi', 'moonshot'), '月之暗面'),
+        (('qwen', 'qwq'), '通义千问'),
+        (('grok',), 'xAI'),
+        (('llama',), 'Meta'),
+        (('minimax', 'abab'), 'MiniMax'),
+        (('doubao', 'seed'), '豆包'),
+        (('mistral', 'mixtral', 'devstral'), 'Mistral'),
+    )
+    for keys, name in table:
+        if any(mid.startswith(k) or ('-' + k) in mid for k in keys):
+            return name
+    return '其他模型'
+
+
+# ───────────────────────── 页面 ─────────────────────────
+@login_required
+@ensure_csrf_cookie
+def page(request):
+    return render(request, 'aichat/index.html')
+
+
+# ───────────────────────── 初始化 ─────────────────────────
+@login_required
+@require_GET
+def bootstrap(request):
+    user = request.user
+    name = (user.get_full_name() or '').strip() or user.username
+    role = '教师' if user.is_staff else '已登录'
+    return JsonResponse({
+        'user': {
+            'id': user.id,
+            'name': name,
+            'initial': (name or 'U')[0].upper() if name else 'U',
+            'role': role,
+        },
+        'csrf': request.META.get('CSRF_COOKIE', ''),
+        'backends': ['hermes', 'direct'],
+    })
 
 
 @login_required
 @require_GET
-def api_models(request):
-    direct = _direct_models()
-    preferred = ["deepseek-v4.1-flash", "deepseek-v4-pro", "glm-5.3", "kimi-k3",
-                 "qwen3.8-max", "grok-4.7", "minimax-m3"]
-    ordered = [m for m in preferred if m in direct] + [m for m in direct if m not in preferred]
+def models(request):
+    """直连模式的可用模型清单，10 分钟缓存；上游挂了就返回兜底列表。"""
+    now = time.time()
+    if _model_cache['data'] and now - _model_cache['at'] < MODEL_CACHE_TTL:
+        return JsonResponse({'models': _model_cache['data'], 'cached': True})
+
+    cfg = _cfg()['direct']
+    items = []
+    try:
+        headers = {'Authorization': 'Bearer ' + cfg['key']} if cfg['key'] else {}
+        headers['x-opencode-session'] = 'liufeisheng-site'
+        resp = requests.get(cfg['models_url'], headers=headers, timeout=12)
+        resp.raise_for_status()
+        data = resp.json().get('data') or resp.json().get('models') or []
+        for m in data:
+            mid = m.get('id') if isinstance(m, dict) else str(m)
+            if not mid or mid in _BLOCKED_MODELS:
+                continue
+            items.append({'id': mid, 'label': mid, 'group': _group_of(mid)})
+    except Exception:
+        items = []
+
+    if not items:
+        fallback = ['deepseek-v4.1-flash', 'deepseek-v4-flash', 'glm-4.7-flash',
+                    'gemini-3.6-flash', 'kimi-k2', 'gpt-5.2-mini']
+        items = [{'id': m, 'label': m, 'group': _group_of(m)} for m in fallback]
+
+    order = ['DeepSeek', 'OpenAI', 'Anthropic', 'Google', '智谱 GLM', '月之暗面',
+             '通义千问', 'xAI', '豆包', 'MiniMax', 'Mistral', 'Meta', '其他模型']
+    items.sort(key=lambda x: (order.index(x['group']) if x['group'] in order else 99, x['id']))
+    _model_cache['at'], _model_cache['data'] = now, items
+    return JsonResponse({'models': items})
+
+
+# ───────────────────────── 会话 ─────────────────────────
+@login_required
+@require_http_methods(['GET', 'POST'])
+def conversations(request):
+    if request.method == 'GET':
+        qs = (Conversation.objects
+              .filter(user=request.user, archived=False)
+              .order_by('-pinned', '-updated_at')[:200])
+        return JsonResponse({'conversations': [c.as_dict() for c in qs]})
+
+    data = _json_body(request)
+    conv = Conversation.objects.create(
+        user=request.user,
+        title=(data.get('title') or '')[:120],
+        backend=data.get('backend') or 'hermes',
+        model=(data.get('model') or '')[:80],
+    )
+    return JsonResponse({'conversation': conv.as_dict()}, status=201)
+
+
+def _get_conv(request, cid):
+    try:
+        return Conversation.objects.get(id=cid, user=request.user)
+    except Conversation.DoesNotExist:
+        raise Http404('会话不存在')
+
+
+@login_required
+@require_http_methods(['GET', 'PATCH', 'DELETE'])
+def conversation_detail(request, cid):
+    conv = _get_conv(request, cid)
+    if request.method == 'GET':
+        return JsonResponse({'conversation': conv.as_dict()})
+
+    if request.method == 'PATCH':
+        data = _json_body(request)
+        if 'title' in data:
+            conv.title = (data.get('title') or '').strip()[:120] or conv.title
+        if 'pinned' in data:
+            conv.pinned = bool(data.get('pinned'))
+        if 'archived' in data:
+            conv.archived = bool(data.get('archived'))
+        if 'model' in data:
+            conv.model = (data.get('model') or '')[:80]
+        if 'backend' in data:
+            conv.backend = (data.get('backend') or conv.backend)[:16]
+        conv.save()
+        return JsonResponse({'conversation': conv.as_dict()})
+
+    conv.delete()
+    return JsonResponse({'ok': True})
+
+
+@login_required
+@require_GET
+def conversation_messages(request, cid):
+    conv = _get_conv(request, cid)
+    msgs = conv.messages.all().order_by('id')
     return JsonResponse({
-        "backends": [
-            {"id": "hermes", "label": "Hermes Agent · 可读写文件/用工具",
-             "note": "由 NAS 上 Hermes 容器作答，模型固定（当前 deepseek-v4.1-flash / opencode-go）"},
-            {"id": "direct", "label": "直连模型 · 纯对话（可切模型）",
-             "note": "直接调用 OpenCode Go，响应更快但没有工具能力"},
-        ],
-        "agent_model": "hermes-agent",
-        "direct_models": ordered,
+        'conversation': conv.as_dict(),
+        'messages': [m.as_dict() for m in msgs],
     })
 
 
-# ─────────────────────────── 对话（SSE 透传） ───────────────────────────
+@login_required
+@require_http_methods(['DELETE'])
+def message_detail(request, cid, mid):
+    conv = _get_conv(request, cid)
+    deleted, _ = Message.objects.filter(id=mid, conversation=conv).delete()
+    return JsonResponse({'ok': bool(deleted)})
+
+
+# ───────────────────────── 对话主流程 ─────────────────────────
 @login_required
 @require_POST
-def api_chat(request):
-    try:
-        payload = json.loads(request.body.decode("utf-8") or "{}")
-    except Exception:
-        return JsonResponse({"error": "请求体不是合法 JSON"}, status=400)
+def chat(request):
+    data = _json_body(request)
+    text = (data.get('message') or '').strip()
+    if not text:
+        return HttpResponseBadRequest('message 不能为空')
 
-    mode = payload.get("mode") or "hermes"
-    messages = payload.get("messages") or []
-    attachments = payload.get("attachments") or []
-    model = payload.get("model") or "deepseek-v4.1-flash"
-    if not messages or not isinstance(messages, list):
-        return JsonResponse({"error": "messages 不能为空"}, status=400)
+    backend = 'direct' if data.get('backend') == 'direct' else 'hermes'
+    model = (data.get('model') or '').strip() if backend == 'direct' else ''
+    atts = [a for a in (data.get('attachments') or []) if isinstance(a, dict) and a.get('name')]
 
-    cfg = _cfg()
-
-    if mode == "hermes":
-        # 附件：把 agent 容器内可见路径告诉它
-        if attachments:
-            listing = "\n".join("- " + a for a in attachments)
-            messages = [dict(m) for m in messages]
-            messages[-1]["content"] = (
-                (messages[-1].get("content") or "")
-                + "\n\n[用户上传的附件已在 NAS 上，可直接用文件工具读取：]\n" + listing
-                + "\n若要把生成的文件交给用户下载，请写入同一目录 %s/u%d/ 下，并告知文件名。"
-                  % (AGENT_UPLOAD_ROOT, request.user.id)
-            )
-        url = cfg["hermes_url"].rstrip("/") + "/chat/completions"
-        headers = {
-            "Authorization": "Bearer " + cfg["hermes_key"],
-            "Content-Type": "application/json",
-            "X-Hermes-Session-Key": "aichat:user:%d" % request.user.id,
-        }
-        body = {"model": "hermes-agent", "messages": messages, "stream": True}
-    else:
-        url = cfg["opencode_url"].rstrip("/") + "/chat/completions"
-        headers = {
-            "Authorization": "Bearer " + cfg["opencode_key"],
-            "Content-Type": "application/json",
-            "User-Agent": "hermes-aichat/1.0",
-            "x-opencode-session": "hermes-aichat-web",
-        }
-        body = {"model": model, "messages": messages, "stream": True}
-
-    try:
-        upstream = requests.post(url, json=body, headers=headers, stream=True,
-                                 timeout=(10, 900))
-    except Exception as e:
-        return JsonResponse({"error": "后端连接失败：%s" % e}, status=502)
-
-    if upstream.status_code >= 400:
-        detail = upstream.text[:500]
-        upstream.close()
-        return JsonResponse({"error": "后端返回 %d：%s" % (upstream.status_code, detail)},
-                            status=502)
-
-    def stream():
+    # 定位/新建会话
+    conv = None
+    if data.get('conversation_id'):
         try:
-            for line in upstream.iter_lines(chunk_size=1024):
-                if line:
-                    yield line + b"\n\n"
-                else:
-                    yield b": ping\n\n"
-        except Exception as e:                       # 上游中断也别让连接悬着
-            err = json.dumps({"error": "stream interrupted: %s" % e}, ensure_ascii=False)
-            yield ("data: " + err + "\n\n").encode("utf-8")
-        finally:
-            upstream.close()
+            conv = Conversation.objects.get(id=int(data['conversation_id']), user=request.user)
+            if not conv.title:
+                conv.title = _short_title(text)
+        except (Conversation.DoesNotExist, ValueError, TypeError):
+            conv = None
+    if conv is None:
+        conv = Conversation.objects.create(
+            user=request.user, title=_short_title(text),
+            backend=backend, model=model,
+        )
 
-    resp = StreamingHttpResponse(stream(), content_type="text/event-stream")
-    resp["Cache-Control"] = "no-cache"
-    resp["X-Accel-Buffering"] = "no"                 # 关掉 nginx 缓冲，逐字输出
+    conv.backend, conv.model = backend, model
+    conv.save(update_fields=['backend', 'model'])
+
+    # 「重新生成」：把上一轮用户提问及其后的回答一起删掉，再用同样的提问重发
+    if data.get('regenerate'):
+        last_user = conv.messages.filter(role='user').order_by('-id').first()
+        if last_user:
+            conv.messages.filter(id__gte=last_user.id).delete()
+
+    user_msg = Message(conversation=conv, role='user', content=text,
+                       backend=backend, model=model)
+    user_msg.attachments = atts
+    user_msg.save()
+
+    # 组装上游 messages（取最近 40 条，避免长会话越聊越慢/越贵）
+    recent = list(conv.messages.order_by('-id')[:40])
+    history = list(reversed(recent))
+    payload_msgs = []
+    if backend == 'direct':
+        payload_msgs.append({'role': 'system', 'content': SYSTEM_PROMPT})
+    for m in history:
+        if m.role not in ('user', 'assistant'):
+            continue
+        content = m.content or ''
+        if m.id == user_msg.id and atts and backend == 'hermes':
+            lines = '\n'.join('- %s（%s）' % (a.get('name'), a.get('agent_path') or '')
+                              for a in atts)
+            content += ('\n\n[附件] 用户上传了以下文件，可直接用文件工具读取；'
+                        '如生成了新文件，请写入同一目录：\n' + lines)
+        payload_msgs.append({'role': m.role, 'content': content})
+
+    cfg = _cfg()[backend]
+    upstream = {'model': model or 'hermes-agent', 'messages': payload_msgs,
+                'stream': True, 'temperature': 0.7}
+    headers = {'Content-Type': 'application/json', 'Accept': 'text/event-stream'}
+    if cfg['key']:
+        headers['Authorization'] = 'Bearer ' + cfg['key']
+    if backend == 'hermes':
+        headers['x-opencode-session'] = 'hermes-nas-opencode-go'
+        headers['X-Hermes-Session-Key'] = 'aichat:user:%s:conv:%s' % (request.user.id, conv.id)
+    else:
+        # OpenCode Go 强制要求 x-opencode-session，缺了直接 400 MissingSessionID
+        headers['x-opencode-session'] = 'aichat-site-u%s-conv%s' % (request.user.id, conv.id)
+
+    conv_id, conv_title = conv.id, conv.title
+
+    def gen():
+        acc, err_text = [], ''
+        try:
+            yield _sse({'conversation_id': conv_id, 'title': conv_title})
+            resp = requests.post(cfg['url'], json=upstream, headers=headers,
+                                 stream=True, timeout=(15, 600))
+            if resp.status_code >= 400:
+                body = ''
+                try:
+                    body = resp.text[:400]
+                except Exception:
+                    pass
+                raise RuntimeError('上游 %s 返回 %s %s' % (backend, resp.status_code, body))
+
+            for raw in resp.iter_lines(decode_unicode=True):
+                if raw is None:
+                    continue
+                line = raw.strip()
+                if not line or line.startswith(':'):
+                    continue
+                if not line.startswith('data:'):
+                    continue
+                chunk = line[5:].strip()
+                if chunk == '[DONE]':
+                    break
+                try:
+                    obj = json.loads(chunk)
+                except Exception:
+                    continue
+                delta = ''
+                choices = obj.get('choices') or []
+                if choices:
+                    d = choices[0].get('delta') or {}
+                    delta = d.get('content') or ''
+                    if not delta:
+                        delta = (choices[0].get('message') or {}).get('content') or ''
+                elif isinstance(obj.get('delta'), str):
+                    delta = obj['delta']
+                elif isinstance(obj.get('content'), str) and obj.get('type') in (None, 'delta', 'text'):
+                    delta = obj['content']
+                if delta:
+                    acc.append(delta)
+                    yield _sse({'delta': delta})
+            yield _sse({'done': True})
+        except GeneratorExit:
+            err_text = ''
+            raise
+        except Exception as exc:
+            err_text = str(exc)[:500]
+            try:
+                yield _sse({'error': err_text})
+            except Exception:
+                pass
+        finally:
+            content = ''.join(acc)
+            try:
+                Message.objects.create(
+                    conversation_id=conv_id, role='assistant', content=content,
+                    backend=backend, model=model, error=bool(err_text) and not content,
+                )
+                Conversation.objects.filter(id=conv_id).update(updated_at=timezone.now())
+            except Exception:
+                pass
+
+    resp = StreamingHttpResponse(gen(), content_type='text/event-stream; charset=utf-8')
+    resp['Cache-Control'] = 'no-cache, no-transform'
+    resp['X-Accel-Buffering'] = 'no'
+    resp['Connection'] = 'keep-alive'
     return resp
 
 
-# ─────────────────────────── 文件 ───────────────────────────
+# ───────────────────────── 文件 ─────────────────────────
+NAME_RE = re.compile(r'^[\w\u4e00-\u9fff][\w\u4e00-\u9fff .\-()\[\]]{0,119}$', re.UNICODE)
+MAX_UPLOAD = 50 * 1024 * 1024
+
+
 @login_required
 @require_POST
-def api_upload(request):
-    f = request.FILES.get("file")
-    if not f:
-        return JsonResponse({"error": "没有收到文件"}, status=400)
-    if f.size > MAX_UPLOAD_BYTES:
-        return JsonResponse({"error": "文件超过 %d MB 限制" % (MAX_UPLOAD_BYTES // 1048576)},
-                            status=413)
-    try:
-        name = _safe_name(f.name)
-    except ValueError as e:
-        return JsonResponse({"error": str(e)}, status=400)
+def upload(request):
+    up = request.FILES.get('file')
+    if not up:
+        return HttpResponseBadRequest('缺少 file 字段')
+    if up.size > MAX_UPLOAD:
+        return HttpResponseBadRequest('文件超过 50MB')
 
-    d = _user_dir(request.user)
-    dest = os.path.join(d, name)
-    if os.path.exists(dest):                         # 同名不覆盖，加时间戳
+    name = os.path.basename(up.name or 'file')
+    if not NAME_RE.match(name):
+        return HttpResponseBadRequest('文件名含不允许的字符')
+
+    folder = _user_dir(request.user)
+    target = os.path.join(folder, name)
+    if os.path.exists(target):
         stem, ext = os.path.splitext(name)
-        name = "%s-%s%s" % (stem, time.strftime("%H%M%S"), ext)
-        dest = os.path.join(d, name)
-    with open(dest, "wb") as out:
-        for chunk in f.chunks():
-            out.write(chunk)
-    os.chmod(dest, 0o644)
-    return JsonResponse({
-        "name": name,
-        "size": os.path.getsize(dest),
-        "agent_path": "%s/u%d/%s" % (AGENT_UPLOAD_ROOT, request.user.id, name),
-    })
+        name = '%s_%s%s' % (stem, time.strftime('%H%M%S'), ext)
+        target = os.path.join(folder, name)
 
-
-@login_required
-@require_GET
-def api_files(request):
-    d = _user_dir(request.user)
-    items = []
-    for n in sorted(os.listdir(d)):
-        p = os.path.join(d, n)
-        if os.path.isfile(p):
-            items.append({
-                "name": n,
-                "size": os.path.getsize(p),
-                "mtime": int(os.path.getmtime(p)),
-            })
-    items.sort(key=lambda x: -x["mtime"])
-    return JsonResponse({"files": items})
-
-
-@login_required
-@require_GET
-def api_download(request, name):
+    with open(target, 'wb') as fh:
+        for chunk in up.chunks():
+            fh.write(chunk)
     try:
-        safe = _safe_name(name)
-    except ValueError:
-        raise Http404("文件名不合法")
-    d = os.path.realpath(_user_dir(request.user))
-    path = os.path.realpath(os.path.join(d, safe))
-    if not path.startswith(d + os.sep) or not os.path.isfile(path):
-        raise Http404("文件不存在")
-    return FileResponse(open(path, "rb"), as_attachment=True, filename=safe)
+        os.chmod(target, 0o666)
+    except Exception:
+        pass
+
+    return JsonResponse({'name': name, 'size': up.size,
+                         'agent_path': _agent_path(request.user, name)})
+
+
+@login_required
+@require_GET
+def files(request):
+    folder = _user_dir(request.user)
+    out = []
+    for name in sorted(os.listdir(folder)):
+        full = os.path.join(folder, name)
+        if not os.path.isfile(full) or name.startswith('.'):
+            continue
+        st = os.stat(full)
+        out.append({'name': name, 'size': st.st_size,
+                    'mtime': int(st.st_mtime),
+                    'agent_path': _agent_path(request.user, name)})
+    out.sort(key=lambda x: -x['mtime'])
+    return JsonResponse({'files': out})
+
+
+@login_required
+@require_GET
+def file_download(request, name):
+    folder = os.path.realpath(_user_dir(request.user))
+    full = os.path.realpath(os.path.join(folder, name))
+    if not full.startswith(folder + os.sep) or not os.path.isfile(full):
+        raise Http404('文件不存在')
+    ctype, _ = mimetypes.guess_type(full)
+    return FileResponse(open(full, 'rb'), as_attachment=True,
+                        filename=os.path.basename(full),
+                        content_type=ctype or 'application/octet-stream')
